@@ -235,6 +235,18 @@ socket.on('cpu stats', function(data) {
 	document.getElementById('cpuStatus').innerHTML = data.cpu_status;
 });
 
+socket.on('getmav', function(data) {
+	document.getElementById('mav').innerHTML = data.mav;
+	document.getElementById('vid').innerHTML = data.vid;
+	document.getElementById('webterm').innerHTML = data.webterm;
+	document.getElementById('aud').innerHTML = data.aud;
+	document.getElementById('web').innerHTML = data.web;
+	document.getElementById('filemanager').innerHTML = data.filemanager;
+	document.getElementById('router').innerHTML = data.router;
+	document.getElementById('nmearx').innerHTML = data.nmearx;
+	document.getElementById('driver').innerHTML = data.driver;
+});
+
 </script>
 
 <h1>Software Status and Update</h1>
@@ -260,6 +272,27 @@ socket.on('cpu stats', function(data) {
 					<dt>CPU Status: </dt>
 						<dd id="cpuStatus"></dd>
 				</dl>
+				<h5> Status of Processes: </h5>
+				<dl class="dl-horizontal">
+                                        <dt>audio: </dt>
+                                                <dd id="aud"></dd>
+					<dt>commrouter: </dt>
+                                                <dd id="router"></dd>
+					<dt>file-manager: </dt>
+                                                <dd id="filemanager"></dd>
+					<dt>mavproxy: </dt>
+                                                <dd id="mav"></dd>
+					<dt>nmearx: </dt>
+                                                <dd id="nmearx"></dd>
+                                        <dt>video: </dt>
+                                                <dd id="vid"></dd>
+                                        <dt>webterminal: </dt>
+                                                <dd id="webterm"></dd>
+                                        <dt>webui: </dt>
+                                                <dd id="web"></dd>
+					<dt>wldriver: </dt>
+                                                <dd id="driver"></dd>
+                                </dl>
 			</div>
 		</div>
 	</div>
