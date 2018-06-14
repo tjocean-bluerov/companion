@@ -805,9 +805,28 @@ function getCpuStatus(callback) {
 		callback(stdout);
 	});
 }
+function givemav(){
+	var procstatus = {};
+	
+	var cmd = child_process.exec('screen -ls', function (error, stdout, stderr) {
+		procstatus.mav = stdout.search("mavproxy") < 0 ? "Not Running" : "Running" ;
+		procstatus.vid = stdout.search("video") < 0 ? "Not Running" : "Running" ;
+		procstatus.webterm = stdout.search("webterminal") < 0 ? "Not Running" : "Running" ;
+		procstatus.aud = stdout.search("audio") < 0 ? "Not Running" : "Running" ;
+		procstatus.web = stdout.search("webui") < 0 ? "Not Running" : "Running" ;
+		procstatus.filemanager = stdout.search("file-manager") < 0 ? "Not Running" : "Running" ;
+		procstatus.router = stdout.search("commrouter") < 0 ? "Not Running" : "Running" ;
+		procstatus.nmearx = stdout.search("nmearx") < 0 ? "Not Running" : "Running" ;
+		procstatus.driver = stdout.search("wldriver") < 0 ? "Not Running" : "Running" ;
+		
+		io.emit('getmav', procstatus);
+	});
+	
+}		
 
 // Make updateCPUStats() run once every 5 seconds (=os.loadavg() update rate)
 setInterval(updateCPUStats, 5000);
+setInterval(givemav, 4000);
 
 io.on('connection', function(socket) {
 	
