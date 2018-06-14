@@ -212,6 +212,11 @@ if ! git remote | grep -q local; then
     git remote add local ~/companion
 fi
 
+sudo sed -i '\%stopscreens%d' ~/.bash_aliases
+echo "alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print \$1}' | xargs kill\"" >> ~/.bash_aliases
+
+source ~/.bashrc
+
 echo 'Update Complete, refresh your browser'
 
 sleep 0.1
