@@ -819,6 +819,13 @@ function givemav(){
 		procstatus.nmearx = stdout.search("nmearx") < 0 ? "Not Running" : "Running" ;
 		procstatus.driver = stdout.search("wldriver") < 0 ? "Not Running" : "Running" ;
 		
+		for (var key in procstatus) {
+			if (procstatus[key] == "Running") {
+				procstatus[key] = procstatus[key].fontcolor("green");
+			} else {
+				procstatus[key] = procstatus[key].fontcolor("red");
+			}
+		}
 		io.emit('getmav', procstatus);
 	});
 	
