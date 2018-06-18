@@ -1061,9 +1061,9 @@ io.on('connection', function(socket) {
 				}
 			})
 			
-			logger.log(_companion_directory + '/scripts/start_video.sh' + ' ' + profile.width + ' ' + profile.height + ' ' + profile.frameRate + ' ' + profile.device);
+			logger.log(_companion_directory + '/scripts/restart_video.sh' + ' ' + profile.width + ' ' + profile.height + ' ' + profile.frameRate + ' ' + profile.device);
 			
-			var cmd = child_process.spawn(_companion_directory + '/scripts/start_video.sh', [profile.width, profile.height, profile.frameRate, profile.device], {
+			var cmd = child_process.spawn(_companion_directory + '/scripts/restart_video.sh', [profile.width, profile.height, profile.frameRate, profile.device], {
 				detached: true
 			});
 			
@@ -1181,9 +1181,9 @@ io.on('connection', function(socket) {
 			
 			_activeFormat = { "frameSize": data.width + "x" + data.height, "frameRate": data.interval.denominator, "device": data.id, "format": "H264" }
 			
-			logger.log(_companion_directory + '/scripts/start_video.sh' + ' ' + data.width + ' ' + data.height + ' ' + data.interval.denominator + ' ' + data.id);
+			logger.log(_companion_directory + '/scripts/restart_video.sh' + ' ' + data.width + ' ' + data.height + ' ' + data.interval.denominator + ' ' + data.id);
 			
-			var cmd = child_process.spawn(_companion_directory + '/scripts/start_video.sh', [data.width, data.height, data.interval.denominator, data.id], {
+			var cmd = child_process.spawn(_companion_directory + '/scripts/restart_video.sh', [data.width, data.height, data.interval.denominator, data.id], {
 				detached: true
 			});
 			
@@ -1231,7 +1231,7 @@ io.on('connection', function(socket) {
 			var file_path = "/home/pi/gstreamer2.param";
 			fs.writeFileSync(file_path, params);
 			
-			var cmd = child_process.spawn(_companion_directory + '/scripts/start_video.sh', {
+			var cmd = child_process.spawn(_companion_directory + '/scripts/restart_video.sh', {
 				detached: true
 			});
 			
