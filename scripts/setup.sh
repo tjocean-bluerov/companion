@@ -2,7 +2,7 @@
 
 # RPi2 setup script for use as companion computer. This script is simplified for use with
 # the ArduSub code.
-cd /home/pi
+cd $HOME
 
 # Update package lists and current packages
 sudo apt-get update
@@ -24,7 +24,7 @@ sudo pip install future
 sudo apt-get install -y git
 
 # download and install pymavlink from source in order to have up to date ArduSub support
-git clone https://github.com/mavlink/mavlink.git /home/pi/mavlink
+git clone https://github.com/mavlink/mavlink.git $HOME/mavlink
 
 pushd mavlink
 git submodule init && git submodule update --recursive
@@ -54,7 +54,7 @@ sudo n 5.6.0
 sudo npm install tty.js -g
 
 # clone bluerobotics companion repository
-git clone https://github.com/bluerobotics/companion.git /home/pi/companion
+git clone https://github.com/bluerobotics/companion.git $HOME/companion
 
 cd $HOME/companion/br-webui
 

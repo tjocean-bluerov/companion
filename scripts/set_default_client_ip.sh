@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Copy default cmdline to temp
-cp /home/pi/companion/tools/cmdline.txt /tmp/
+cp $HOME/companion/tools/cmdline.txt /tmp/
 # Add ip in the end of cmdline
 echo "ip=${1}" >> /tmp/cmdline.txt
 # Cat everything to make sure

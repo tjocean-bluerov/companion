@@ -3,7 +3,7 @@
 # multiple IP addresses can receive the telemetry.
 
 # For PixHawk or other connected via USB on Raspberry Pi
-cd /home/pi
+cd $HOME
 # Determine if the param file exists.  If not, use default.
 if [ -e mavproxy.param ]; then
     paramFile="mavproxy.param"

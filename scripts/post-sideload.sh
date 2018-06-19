@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/pi/companion
+cd $HOME/companion
 
 # https://git-scm.com/docs/git-submodule#git-submodule-status--cached--recursive--ltpathgt82308203
 
@@ -8,7 +8,7 @@ cd /home/pi/companion
 # Remove old mavlink directory if it exists
 [ -d ~/mavlink ] && sudo rm -rf ~/mavlink
 echo 'Installing mavlink...'
-cd /home/pi/companion/submodules/mavlink/pymavlink
+cd $HOME/companion/submodules/mavlink/pymavlink
 sudo python setup.py build install
 if [ $? -ne 0 ] # If mavlink installation update failed:
 then
@@ -20,11 +20,11 @@ then
 fi
 
 
-cd /home/pi/companion
+cd $HOME/companion
 
 
 echo 'Installing MAVProxy...'
-cd /home/pi/companion/submodules/MAVProxy
+cd $HOME/companion/submodules/MAVProxy
 sudo python setup.py build install
 if [ $? -ne 0 ] # If MAVProxy installation update failed:
 then
@@ -57,7 +57,7 @@ if pip list | grep pynmea2; then
     echo 'pynmea2 already installed'
 else
     echo 'installing pynmea2...'
-    sudo pip install --no-index --find-links /home/pi/update-dependencies/pynmea2-pip pynmea2
+    sudo pip install --no-index --find-links $HOME/update-dependencies/pynmea2-pip pynmea2
     if [ $? -ne 0 ] # If "pip install pynmea2" failed:
     then
         echo 'Failed to install pynmea2; Aborting update'
@@ -74,9 +74,9 @@ if pip list | grep grequests; then
 else
     echo 'grequests needs install'
     echo 'Extracting prebuilt packages...'
-    sudo unzip -q -o /home/pi/update-dependencies/grequests.zip -d /
+    sudo unzip -q -o $HOME/update-dependencies/grequests.zip -d /
     echo 'installing grequests...'
-    sudo pip install --no-index --find-links /home/pi/update-dependencies/grequests-pip grequests
+    sudo pip install --no-index --find-links $HOME/update-dependencies/grequests-pip grequests
     if [ $? -ne 0 ] # If "pip install grequests" failed:
     then
         echo 'Failed to install grequests; Aborting update'
@@ -88,11 +88,11 @@ else
 fi
 
 # copy default parameters if neccessary
-cd /home/pi/companion/params
+cd $HOME/companion/params
 
 for default_param_file in *; do
     if [[ $default_param_file == *".param.default" ]]; then
-        param_file="/home/pi/"$(echo $default_param_file | sed "s/.default//")
+        param_file="/$HOME"$(echo $default_param_file | sed "s/.default//")
         if [ ! -e "$param_file" ]; then
             cp $default_param_file $param_file
         fi
@@ -114,17 +114,17 @@ if ! git remote | grep -q local; then
     git remote add local ~/companion
 fi
 
-rm -rf /home/pi/update-dependencies
+rm -rf $HOME/update-dependencies
 
 echo 'Update Complete, refresh your browser'
 
 sleep 0.1
 
-echo 'quit webui' >> /home/pi/.update_log
+echo 'quit webui' >> $HOME/.update_log
 screen -X -S webui quit
 
-echo 'restart webui' >> /home/pi/.update_log
-sudo -H -u pi screen -dm -S webui /home/pi/companion/scripts/start_webui.sh
+echo 'restart webui' >> $HOME/.update_log
+sudo -H -u pi screen -dm -S webui $HOME/companion/scripts/start_webui.sh
 
-echo 'removing lock' >> /home/pi/.update_log
-rm -f /home/pi/.updating
+echo 'removing lock' >> $HOME/.update_log
+rm -f $HOME/.updating

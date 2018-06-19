@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /home/pi/companion
+cd $HOME/companion
 
 echo 'validating archive'
 if unzip -l $1 | grep -q companion/.git; then
@@ -10,16 +10,16 @@ else
 fi
 
 echo 'adding lock'
-touch /home/pi/.updating
+touch $HOME/.updating
 
 echo 'removing old backup'
-rm -rf /home/pi/.companion
+rm -rf $HOME/.companion
 
 echo 'backing up repository'
-mv /home/pi/companion /home/pi/.companion
+mv $HOME/companion $HOME/.companion
 
 echo 'extracting archive: ' $1
-unzip -q $1 -d /home/pi
+unzip -q $1 -d $HOME
 
 echo 'running post-sideload.sh'
-/home/pi/companion/scripts/post-sideload.sh
+$HOME/companion/scripts/post-sideload.sh
