@@ -8,7 +8,7 @@ from pymavlink import mavutil
 from pymavlink.dialects.v10 import common as mavlink
 from pymavlink import mavparm
 from optparse import OptionParser
-
+home = os.environ['HOME']
 timeout = 1
 
 parser = OptionParser()
@@ -94,4 +94,4 @@ time.sleep(4)
 
 # Start screen session with mavproxy
 print "Restarting mavproxy"
-os.system("screen -dm -S mavproxy /home/pi/companion/scripts/start_mavproxy_telem_splitter.sh")
+os.system("screen -dm -S mavproxy "+home+"/companion/scripts/start_mavproxy_telem_splitter.sh")

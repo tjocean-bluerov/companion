@@ -3,10 +3,12 @@
 import time
 import socket
 import argparse
+import os
+home = os.environ['HOME']
 
 parser = argparse.ArgumentParser(description="GPS Replay Tool for Testing and Debugging")
 parser.add_argument('--frequency', action="store", type=float, default=10, help="gps message update frequency")
-parser.add_argument('--file', action="store", type=str, default='/home/pi/companion/tools/raw-nmea-log', help="gps log file from which to read")
+parser.add_argument('--file', action="store", type=str, default=home+'/companion/tools/raw-nmea-log', help="gps log file from which to read")
 parser.add_argument('--port', action="store", type=int, default=27000, help="destination port")
 parser.add_argument('--ip', action="store", type=str, default="0.0.0.0", help="destination ip address")
 parser.add_argument('--tcp', action="store_true", default=False, help="use tcp")
