@@ -3,6 +3,8 @@
 import os
 from time import sleep 
 
+os.system("sudo modprobe bcm2835-v4l2")
+
 while True:
   while (os.system("ls /dev/video* 2>/dev/null") != 0) or (os.path.isfile("/home/pi/companion/start_video.sh")):
     sleep(5)
