@@ -36,6 +36,11 @@ socket.on('companion version', function(data) {
 	document.getElementById('companion version').innerHTML = data;
 });
 
+socket.on('ardusub version', function(data) {
+	console.log(data);
+	document.getElementById('ardusub version').innerHTML = data;
+});
+
 socket.on('companion latest', function(data) {
 	console.log('got companion latest');
 	document.getElementById('companionButton').style.display = "inline";
@@ -118,6 +123,7 @@ function showPixhawkSpinner(show) {
 
 socket.emit('get companion version');
 socket.emit('get companion latest');
+socket.emit('get ardusub version');
 
 var uploader = new SocketIOFileClient(socket);
 
@@ -337,6 +343,8 @@ socket.on('getmav', function(data) {
 			</div>
 			<div class="panel-body">
 				<div>
+					<h4> ArduSub Version: </h4>
+					<span id="ardusub version"></span>
 					<h4>Download and Update (Requires Internet Connection):</h4>
 					<button id="devButton" type="button" class="btn btn-primary" onclick="updatePixhawk('dev')" disabled=true>Development</button>
 					<button id="betaButton" type="button" class="btn btn-primary" onclick="updatePixhawk('beta')" disabled=true>Beta</button>

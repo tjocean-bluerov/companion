@@ -1432,7 +1432,24 @@ io.on('connection', function(socket) {
 		});
 	});
 	
-	
+	// system setup
+	socket.on('get ardusub version', function(data) {
+		logger.log('get ardusub version');
+		var cmd = child_process.exec(_companion_directory + '/tools/ardusub.py', function(error, stdout, stderr) {
+			logger.log(error+stdout+stderr);
+			// Check if version information is obtained or not
+			//If not, emit appropriate error message
+			if (error) {
+				logger.log("Version Information not found");
+				socket.emit('ardusub version', "Not found");
+			// If yes, emit it to the web-page
+			} else {
+				logger.log("Version Information Obtained")
+				socket.emit('ardusub version', stdout);
+			}
+		});
+	});
+
 	// system setup
 	socket.on('update pixhawk', function(data) {
 		logger.log("update pixhawk");
