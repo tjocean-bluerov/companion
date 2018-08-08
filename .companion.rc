@@ -13,6 +13,11 @@ for default_param_file in *; do
 done
 
 if [ ! -f /home/pi/.updating ]; then
+	sudo python $COMPANION_DIR/tools/PingEnumerator.py || true
+	if [ -d /dev/serial/ping ]; then
+		sudo -H -u pi screen -dm -S pingproxy python -m Ping/PingProxy --device $(ls -d /dev/serial/ping/* | head -1)
+		sudo -H -u pi screen -dm -S pingmav python $COMPANION_DIR/tools/Ping1DMavlinkDriver.py
+	fi
 	sudo -H -u pi screen -dm -S mavproxy $COMPANION_DIR/tools/telem.py
 	sudo -H -u pi screen -dm -S video $COMPANION_DIR/tools/streamer.py 
 	sudo -H -u pi screen -dm -S webui $COMPANION_DIR/scripts/start_webui.sh

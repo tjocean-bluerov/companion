@@ -159,6 +159,10 @@ app.get('/system', function(req, res) {
 	res.render('system', {});
 });
 
+app.get('/ping', function(req, res) {
+	res.render('ping', {});
+});
+
 app.get('/camera', function(req, res) {
 	res.render('camera', {});
 });
@@ -1509,6 +1513,82 @@ io.on('connection', function(socket) {
 		});
 	});
 
+	
+	
+	// ping device list request
+	socket.on('get ping devices', function(data) {
+		logger.log('get ping devices');
+		
+		// The pingEnumerator.py script runs at boot and creates symlinks
+		// to devices connected at boot.
+		
+		// We could try running the enumerator script again now, but if it is
+		// already communicating with another process, the probe will fail.
+		var cmd = child_process.exec('ls /dev/serial/ping', function(error, stdout, stderr) {
+			logger.log(error, stdout, stderr);
+			if (error) {
+				logger.error('ping device list failed');
+				return;
+			}
+		
+			var devices = [];
+			
+			var lines = stdout.split("\n");
+			for (line in lines) {
+				device = lines[line];
+				logger.log('line', device);
+				logger.log(device.indexOf("Ping1D-id-"));
+				if (device.indexOf("Ping1D-id-") > -1) {
+					logger.log('Found Ping device', device);
+					devices.push(device);
+				}
+			}
+
+			socket.emit('ping devices', devices);
+		});
+	});
+	
+	// ping update
+	socket.on('update ping', function(data) {
+		logger.log("update ping", data);
+		var options = ['-d', '/dev/serial/ping/' + data.device, '-f', '/tmp/data/' + data.file]
+		
+		if (data.verify) {
+			logger.log("verify option");
+			options.push('-v');
+		}
+		
+		var cmd = child_process.spawn(_companion_directory + '/tools/PingBootloader.py', options, {
+			detached: true
+		});
+		
+		
+		// Ignore parent exit, we will restart this application after updating
+		cmd.unref();
+		
+		cmd.stdout.on('data', function (data) {
+			logger.log(data.toString());
+			socket.emit('terminal output', data.toString());
+			if (data.indexOf("Starting execution at address") > -1) {
+				socket.emit('ping update complete');
+			}
+		});
+		
+		cmd.stderr.on('data', function (data) {
+			logger.error(data.toString());
+			socket.emit('terminal output', data.toString());
+		});
+		
+		cmd.on('exit', function (code) {
+			logger.log('ping update exited with code ' + code.toString());
+			socket.emit('ping update complete');
+		});
+		
+		cmd.on('error', (err) => {
+			logger.error('ping update errored: ', err.toString());
+		});
+	});
+	
 	socket.on('restart video', function(data) {
 		logger.log(_companion_directory + '/scripts/restart-raspivid.sh "' + data.rpiOptions + '" "' + data.gstOptions + '"');
 		var cmd = child_process.spawn(_companion_directory + '/scripts/restart-raspivid.sh', [data.rpiOptions , data.gstOptions], {

@@ -4,3 +4,6 @@
 [submodule "submodules/mavlink"]
 	path = submodules/mavlink
 	url = https://github.com/bluerobotics/mavlink.git
+[submodule "submodules/ping-python"]
+	path = submodules/ping-python
+	url = https://github.com/bluerobotics/ping-python
