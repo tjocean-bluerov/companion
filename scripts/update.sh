@@ -1,4 +1,6 @@
 #!/bin/bash
+echo 'STARTING UPDATE'
+echo $(printenv)
 
 REMOTE=$1
 REF=$2

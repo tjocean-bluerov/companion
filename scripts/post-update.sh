@@ -1,4 +1,6 @@
 #!/bin/bash
+echo 'STARTING POST UPDATE'
+echo $(printenv)
 
 # Bugfix for revert on first update. 0.0.7 had a bug in update.sh where the companion directory was not copied correctly (no -r option)
 # Do it the right way here so we can revert if
