@@ -242,11 +242,11 @@ echo 'Update Complete, refresh your browser'
 
 sleep 0.1
 
-echo 'quit webui' >> $HOME/.update_log
+sudo -H -u pi echo 'quit webui' >> $HOME/.update_log
 screen -X -S webui quit
 
-echo 'restart webui' >> $HOME/.update_log
+sudo -H -u pi echo 'restart webui' >> $HOME/.update_log
 sudo -H -u pi screen -dm -S webui $HOME/companion/scripts/start_webui.sh
 
-echo 'removing lock' >> $HOME/.update_log
+sudo -H -u pi echo 'removing lock' >> $HOME/.update_log
 rm -f $HOME/.updating
