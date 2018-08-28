@@ -814,25 +814,98 @@ function getCpuStatus(callback) {
 }
 function givemav(){
 	var procstatus = {};
+	// Assign space and properties to status string
+	var status = "&emsp;&emsp;Status:&ensp;".fontcolor("black");
 	
+	// Check the list of screens to find out which process is running
 	var cmd = child_process.exec('screen -ls', function (error, stdout, stderr) {
-		procstatus.mav = stdout.search("mavproxy") < 0 ? "Not Running" : "Running" ;
-		procstatus.vid = stdout.search("video") < 0 ? "Not Running" : "Running" ;
-		procstatus.webterm = stdout.search("webterminal") < 0 ? "Not Running" : "Running" ;
-		procstatus.aud = stdout.search("audio") < 0 ? "Not Running" : "Running" ;
-		procstatus.web = stdout.search("webui") < 0 ? "Not Running" : "Running" ;
-		procstatus.filemanager = stdout.search("file-manager") < 0 ? "Not Running" : "Running" ;
-		procstatus.router = stdout.search("commrouter") < 0 ? "Not Running" : "Running" ;
-		procstatus.nmearx = stdout.search("nmearx") < 0 ? "Not Running" : "Running" ;
-		procstatus.driver = stdout.search("wldriver") < 0 ? "Not Running" : "Running" ;
+		procstatus.mav = stdout.search("mavproxy") < 0 ? "Not Running&emsp;&emsp;" : "Process Running" ;
+		procstatus.vid = stdout.search("video") < 0 ? "Not Running&emsp;&emsp;" : "Process Running" ;
+		procstatus.webterm = stdout.search("webterminal") < 0 ? "Not Running" : "Process Running" ;
+		procstatus.aud = stdout.search("audio") < 0 ? "Not Running&emsp;&emsp;" : "Process Running" ;
+		procstatus.web = stdout.search("webui") < 0 ? "Not Running" : "Process Running";
+		procstatus.filemanager = stdout.search("file-manager") < 0 ? "Not Running" : "Process Running" ;
+		procstatus.router = stdout.search("commrouter") < 0 ? "Not Running" : "Process Running" ;
+		procstatus.nmearx = stdout.search("nmearx") < 0 ? "Not Running" : "Process Running" ;
+		procstatus.driver = stdout.search("wldriver") < 0 ? "Not Running" : "Process Running" ;
 		
+		logger.log(stdout+stderr);
+
+		// Check if pixhawk is connected or not 
+		var cmd1 = child_process.exec('ls /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00', function (error, stdout, stderr) {
+			// If not show the respective error messages
+			if (error) {
+				if (procstatus.mav.search("Process Running") >= 0) {
+					procstatus.mav = procstatus.mav.fontcolor("green") + status + ("Pixhawk is unplugged").fontcolor("red");
+				} else {
+					procstatus.mav = procstatus.mav.fontcolor("red") + status + ("Pixhawk is unplugged").fontcolor("red");
+				}
+				io.emit('getmav', procstatus);
+			// If it is connected, show the respective 'okay' status messages			
+			} else {
+				if (procstatus.mav.search("Process Running") >= 0) {
+					procstatus.mav = procstatus.mav.fontcolor("green") + status + ("OK").fontcolor("green");
+				} else {
+					procstatus.mav = procstatus.mav.fontcolor("red") + status + ("Pixhawk is plugged in").fontcolor("green");
+				}
+				io.emit('getmav', procstatus);
+			}
+		});
+
+		// Check if any microphone devices are connected or not
+		var cmd2 = child_process.exec('ls /dev/snd/by-id', function (error, stdout, stderr) {
+			// If not show the respective error messages
+			if (error) {
+				if (procstatus.aud.search("Process Running") >= 0) {
+					procstatus.aud = procstatus.aud.fontcolor("green") + status + ("No Audio device found").fontcolor("red");
+				} else {
+					procstatus.aud = procstatus.aud.fontcolor("red") + status + ("No Audio device found").fontcolor("red");
+				}
+				io.emit('getmav', procstatus);
+			// If there is a microphone device plugged in, show the respective 'okay' status messages
+			} else {
+				if (procstatus.aud.search("Process Running") >= 0) {
+					procstatus.aud = procstatus.aud.fontcolor("green") + status + ("OK").fontcolor("green");
+				} else {
+					procstatus.aud = procstatus.aud.fontcolor("red") + status + ("Audio device is plugged in").fontcolor("green");
+				}
+				io.emit('getmav', procstatus);
+			}
+		});
+		
+		//Check if any video device is connected or not
+		var cmd3 = child_process.exec('ls /dev/video*', function (error, stdout, stderr) {
+			//If not show the respective error messages
+			if (error) {
+				if (procstatus.vid.search("Process Running") >= 0) {
+					procstatus.vid = procstatus.vid.fontcolor("green") + status + ("No Video device found").fontcolor("red");
+				} else {
+					procstatus.vid = procstatus.vid.fontcolor("red") + status + ("No Video device found").fontcolor("red");
+				}
+				io.emit('getmav', procstatus);
+			// If there is a video device connected, show the respective 'okay' status messages
+			} else {
+				if (procstatus.vid.search("Process Running") >= 0) {
+					procstatus.vid = procstatus.vid.fontcolor("green") + status + ("OK").fontcolor("green");
+				} else {
+					procstatus.vid = procstatus.vid.fontcolor("red") + status + ("Video device is plugged in").fontcolor("green");
+				}
+				io.emit('getmav', procstatus);
+			}
+		});
+		/*Assign specific status messages for all other processes except mavproxy, video and audio. We are doing this because these three screens are external device dependent and their
+		status messages are different in case of errors.*/
 		for (var key in procstatus) {
-			if (procstatus[key] == "Running") {
+			if (procstatus[key] == "Process Running" && key!="mav" && key!="vid" && key!="aud") {
 				procstatus[key] = procstatus[key].fontcolor("green");
 			} else {
-				procstatus[key] = procstatus[key].fontcolor("red");
+				if (key!="mav" && key!="vid" && key!="aud"){
+					procstatus[key] = procstatus[key].fontcolor("red");
+				}
 			}
 		}
+
+		// Emit messages for all other processes except mavproxy, video and audio.
 		io.emit('getmav', procstatus);
 	});
 	
