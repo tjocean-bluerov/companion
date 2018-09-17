@@ -90,7 +90,7 @@
 		} else {
 			$("input[type=range]").slider("enable");
 		}
-		$("input[type=checkbox]").bootstrapSwitch('disabled', disable);
+		$("input[camera_bool]").bootstrapSwitch('disabled', disable);
 	}
 	
 	function fpsSelected() {
@@ -259,6 +259,7 @@
 
 			if (control.type == "bool") {
 				new_element.type = "checkbox";
+				new_element.camera_bool = true;
 				new_element.checked = control.value;
 				
 				new_element.onchange = function(data) {
@@ -367,7 +368,7 @@
 			if (!exists) {
 				sliderContainer.appendChild(h5);
 				sliderContainer.appendChild(new_element);
-				if(new_element.type == 'checkbox') {
+				if(new_element.camera_bool) {
 					$(new_element).bootstrapSwitch();
 				} else if($(new_element).is('select')) {
 					$(new_element).selectpicker();
