@@ -42,7 +42,7 @@
 					<span id="companion version1"></span>
 				</p> 
 			</div>
-			<div id="navbar" class="collapse navbar-collapse">
+			<div id="navbar" class="collapse navbar-collapse" align="right">
 				<ul class="nav navbar-nav">
 					<li><a href="/network">Network</a></li>
 					<li><a href="/system">System</a></li>
@@ -52,6 +52,13 @@
 				<form class="navbar-form navbar-right">
 					<button onclick="reboot()" class="btn btn-primary btn-sm navbar-btn">Reboot</button>
 					<button onclick="shutdown()" class="btn btn-error btn-sm navbar-btn">Shutdown</button>
+                <ul class="toggle">
+                    <label class="switch">
+                        <input id='advanced-checkbox' type="checkbox">
+                        <span class="slidernew round"></span>
+                    </label>
+                    Enable Advanced Options
+                </ul>
 				</form>
 			</div><!--/.nav-collapse -->
 		</div>
