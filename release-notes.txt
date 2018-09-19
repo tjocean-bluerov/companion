@@ -70,3 +70,26 @@ Initial release
 
 - Add vlc.sdp
 - Update Water Linked driver
+
+0.0.16:
+
+- Disable periodic telemetry streamrate override in mavproxy default options
+- Add preliminary support for Blue Robotics Ping1D echosounder
+- Add advanced options toggle switch to header
+- Add DHCP options to /network page (advanced)
+- Add status of processes (screens) to /system page
+- Add detected devices to /system page
+- Add Companion software version information to header
+- Add ArduSub firmware version to /system page
+- Add system log download to /system page
+- Allow camera hotplugging
+- Allow pixhawk hotplugging
+- Allow microphone hotplugging
+- Add TCP support for NMEA receiver (nmearx)
+- Use Mavlink2 for default mavproxy options
+- Add bash alias to kill all screens at once (`stopscreens`)
+- Add log directory, persistent storage of all telemetry logs (via mavproxy --aircraft option)
+- Add environment variable logging to update scripts
+- Bugfix: permissions on update script logging
+- Bugfix: factory default parameter reset was broken
+- Bugfix: "undefined" appearing next to wifi status on /network page
