@@ -102,3 +102,9 @@ input:checked + .slidernew:before {
 .toggle {
   color: white;
 }
+
+/* removes margins from navbar form so the bar stays thin*/
+.navbar-form {
+  margin-top: 0;
+  margin-bottom: 0;
+}
