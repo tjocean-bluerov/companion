@@ -1608,8 +1608,8 @@ io.on('connection', function(socket) {
 	// ping device list request
 	socket.on('get ping devices', function(data) {
 		logger.log('get ping devices');
-		
-		// The pingEnumerator.py script runs at boot and creates symlinks
+
+		// The ping_enumerator.py script runs at boot and creates symlinks
 		// to devices connected at boot.
 		
 		// We could try running the enumerator script again now, but if it is
