@@ -1,57 +1,76 @@
-#!/usr/bin/python -u
+#!/usr/bin/env python -u
 
-# Scan serial ports for ping devices
-# Symlinks to detected devices are created under /dev/serial/ping/
-# This script needs root permission to create the symlinks
-# Exits with the number of ping devices detected
-
-from Ping import Ping1D
+"""Scan serial ports for ping devices
+    Symlinks to detected devices are created under /dev/serial/ping/
+    This script needs root permission to create the symlinks
+    Exits with the number of ping devices detected
+"""
 import subprocess
+from Ping import Ping1D
 
-# Remove any previously created links
-try:
-    output = subprocess.check_output(["rm", "-rf", "/dev/serial/ping"])
-except subprocess.CalledProcessError as e:
-    print e
+def main():
+    """Main function
+        Enumerate new ping devices
+    """
+    # Remove any previously created links
+    try:
+        output = subprocess.check_output(["rm", "-rf", "/dev/serial/ping"])
+    except subprocess.CalledProcessError as exception:
+        print(exception)
 
-# Look for connected serial devices
-try:
-    output = subprocess.check_output("ls /dev/serial/by-id", shell=True)
-except subprocess.CalledProcessError as e:
-    print e
-    exit(0)
+    # Look for connected serial devices
+    try:
+        output = subprocess.check_output("ls /dev/serial/by-id", shell=True)
+    except subprocess.CalledProcessError as exception:
+        print(exception)
+        exit(1)
 
-pings_found = 0
+    pings_found = 0
 
-# Look at each serial device, probe for ping
-for dev in output.split('\n'):
-    if len(dev) > 0:
+    # Look at each serial device, probe for ping
+    for dev in output.split('\n'):
+        if not dev:
+            continue
+
         byiddev = "/dev/serial/by-id/" + dev
 
         print("Looking for Ping at %s" % byiddev)
-        newPing = Ping1D.Ping1D(byiddev)
+        new_ping = Ping1D.Ping1D(byiddev)
 
-        if newPing.initialize() == True:
-            try:
-                if newPing.get_device_id() != None and newPing.get_fw_version() != None:
+        if not new_ping.initialize():
+            continue
 
-                    # ex Ping1D-id-43-t-1-m-1-v-3.19
-                    description = "/dev/serial/ping/Ping1D-id-%s-t-%s-m-%s-v-%s.%s" % (newPing.device_id, newPing.device_type, newPing.device_model, newPing.fw_version_major, newPing.fw_version_minor)
-                    print "Found Ping1D (ID: %d) at %s" % (newPing.device_id, dev)
+        try:
+            if new_ping.get_device_id() and new_ping.get_fw_version():
 
-                    # Follow link to actual device
-                    target_device = subprocess.check_output("readlink -f " + byiddev, shell=True)
-                    # Strip newline from output
-                    target_device = target_device.split('\n')[0]
+                # ex Ping1D-id-43-t-1-m-1-v-3.19
+                description = "/dev/serial/ping/Ping1D-id-%s-t-%s-m-%s-v-%s.%s" % (
+                    new_ping.device_id,
+                    new_ping.device_type,
+                    new_ping.device_model,
+                    new_ping.fw_version_major,
+                    new_ping.fw_version_minor
+                    )
+                print("Found Ping1D (ID: %d) at %s" % (new_ping.device_id, dev))
 
-                    # Create another link to it
-                    print "Creating symbolic link to", target_device
-                    subprocess.check_output("mkdir -p /dev/serial/ping", shell=True)
-                    output = subprocess.check_output("ln -fs " + target_device + " " + description, shell=True)
-                    pings_found += 1
+                # Follow link to actual device
+                target_device = subprocess.check_output(' '.join(["readlink", "-f", byiddev]), shell=True)
+                # Strip newline from output
+                target_device = target_device.split('\n')[0]
 
-            except subprocess.CalledProcessError as e:
-                print e
-                continue
+                # Create another link to it
+                print("Creating symbolic link to", target_device)
+                subprocess.check_output(' '.join(["mkdir", "-p", "/dev/serial/ping"]), shell=True)
+                output = subprocess.check_output("ln -fs %s %s" % (
+                    target_device,
+                    description), shell=True)
+                pings_found += 1
 
-exit(pings_found)
+        except subprocess.CalledProcessError as exception:
+            print(exception)
+            continue
+
+    exit(pings_found)
+
+if __name__ == '__main__':
+    main()
