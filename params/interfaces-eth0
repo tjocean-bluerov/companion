@@ -1,0 +1,18 @@
+#Add cofiguration mapping for interface eth0
+allow-hotplug eth0
+mapping eth0
+    script /home/pi/companion/scripts/eth0-mapping-config.sh
+
+
+#Add network configuration settings for Manual mode
+iface config-manual inet static
+address 192.168.2.2
+netmask 255.255.255.0 
+
+#Add network configuration settings for DHCP Server 
+iface config-server inet static
+address 192.168.2.2
+netmask 255.255.255.0
+
+#Add network configuration settings for DHCP Client
+iface config-client inet dhcp
