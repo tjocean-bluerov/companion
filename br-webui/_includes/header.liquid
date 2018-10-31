@@ -15,6 +15,17 @@
 		function shutdown() {
 			socket.emit('shutdown');
 		}
+
+		function enableAdvanced() {
+			// need to invert, dk why, maybe todo with transition/animation duration
+			var enabled = !document.getElementById("advanced-checkbox").checked;
+			console.log("advanced checkbox enabled", enabled);
+			var div = document.getElementsByClassName("companion-advanced");
+			for (var i=0; i<div.length; i++) {
+				div[i].style.display = enabled ? "block" : "none";
+			}
+		}
+
 		socket.on('companion version', function(data) {
 			document.getElementById('companion version1').innerHTML = data;
 			console.log('got version in header')
@@ -52,13 +63,13 @@
 				<form class="navbar-form navbar-right">
 					<button onclick="reboot()" class="btn btn-primary btn-sm navbar-btn">Reboot</button>
 					<button onclick="shutdown()" class="btn btn-error btn-sm navbar-btn">Shutdown</button>
-                <ul class="toggle">
-                    <label class="switch">
-                        <input id='advanced-checkbox' type="checkbox">
-                        <span class="slidernew round"></span>
-                    </label>
-                    Enable Advanced Options
-                </ul>
+				<ul class="toggle">
+					<label class="switch">
+						<input id='advanced-checkbox' type="checkbox">
+						<span class="slidernew round" onclick="enableAdvanced()"></span>
+					</label>
+					Enable Advanced Options
+				</ul>
 				</form>
 			</div><!--/.nav-collapse -->
 		</div>
