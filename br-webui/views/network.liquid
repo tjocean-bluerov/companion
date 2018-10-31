@@ -180,22 +180,83 @@ function isValidIP(ip) {
 	return /^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/.test(ip);
 }
 
+// Method to change the default ip of companion only when it is in manual mode.
 function setCompanionEthernetIP() {
-	var ip_addr = prompt("Please enter a new IP Address");
+	var modeValue = document.getElementById("current-config").innerText;
+	var mode = modeValue.trim();
+	console.log(mode);
+	if (mode === "Manual") {
+		var ip_addr = prompt("Please enter a new IP Address");
 
-	var valid_ip = isValidIP(ip_addr)
-	if (!valid_ip) {
-		alert("Invalid IP address: " + ip_addr);
-		return
-	}
+		var valid_ip = isValidIP(ip_addr);
+		if (!valid_ip) {
+			alert("Invalid IP address: " + ip_addr);
+			return;
+		}
 	
-	if (confirm("Are you sure you want to change the ethernet IP to " + ip_addr + "?")) {
-		socket.emit('set default ip', ip_addr);
+		if (confirm("Are you sure you want to change the ethernet IP to " + ip_addr + "?")) {
+			socket.emit("set default ip", ip_addr);
+		}
+		alert("New IP will take affect after reboot");
+	} else {
+		alert("Changing IP address is only allowed in manual mode");
 	}
-	alert("New IP will take affect after reboot");
+}
+
+// Get the current network configuration
+socket.on("current network config", function(data) {
+	var currentConf = data.trim()
+	var configuration = currentConf.fontcolor("green");
+	document.getElementById("current-config").innerHTML=configuration;
+	if (currentConf === "Manual") {
+		document.getElementById("manual").checked=true;
+		console.log("got current configuration");
+	} else if(currentConf === "DHCP Server") {
+		console.log("current configuration is dhcp server");
+		document.getElementById("server").checked=true;
+		console.log("got current configuration");
+	} else if(currentConf === "DHCP Client") {
+		document.getElementById("client").checked=true;
+		console.log("got current configuration");
+	} else {
+		console.log("configuration data not recieved");
+	}
+});
+
+// Set companion network configuration according to the option selected by user
+function setCompanionMode() {
+	if (document.getElementById("manual").checked) {
+		if (confirm("Are you sure you want to configure Companion \
+as the default Manual mode? The system will automatically reboot for \
+reconfiguration")) {
+			socket.emit("configure-network", "Manual");
+			alert("Companion has been configured to manual mode. The pi will \
+restart in a few seconds. Do not interrupt the configuration process and make \
+sure the pi remains plugged in to a power supply. Please refer to Network \
+Setup instructions to regain connection with your Pi.");
+		}
+	} else if (document.getElementById("server").checked) {
+		if (confirm("Are you sure you want to configure Companion \
+as a DHCP server? The system will automatically reboot for reconfiguration")) {
+			socket.emit("configure-network", "Server");
+			alert("Companion has been configured as DHCP server. The pi will \
+restart in a few seconds. Do not interrupt the configuration process and make \
+sure the pi remains plugged in to a power supply.");
+		}
+	} else if (document.getElementById("client").checked) {
+		if (confirm("Are you sure you want to configure Companion \
+as a DHCP client? The system will automatically reboot for reconfiguration")) {
+			socket.emit("configure-network", "Client");
+			alert("Companion has been configured as DHCP client. The pi will \
+restart in a few seconds. Do not interrupt the configuration process and make \
+sure the pi remains plugged in to a power supply. Find out the respective new \
+IP address for the pi to reconnect.");
+		}
+	}
 }
 
 socket.emit('get current ip');
+socket.emit("get-network-configuration");
 
 socket.on('current ip', function(data) {
 	console.log("got ethernet ip:", data);
@@ -242,12 +303,12 @@ socket.on('current ip', function(data) {
 </div>
 
 <!-- Ethernet Setup -->
-<div class="row">
+<div class="row companion-advanced" style="display:none">
 	<div class="col-md-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				<h3 class="panel-title">
-					Ethernet Setup
+					Ethernet Configuration
 				</h3>
 			</div>
 			<div class="panel-body">
@@ -256,6 +317,19 @@ socket.on('current ip', function(data) {
 					<button type="button" class="btn btn-primary"
 						id="eth0 ip button" onclick="setCompanionEthernetIP()">
 						Change Companion Default Ethernet IP</button>
+				</dl>
+				<dl class="dl-horizontal">
+					<h4> Current Configuration: <span id="current-config"></span></h4>
+					<h4 id="configure"> Companion Network Settings: </h4>
+					<input type="radio" name="config" id="manual"/> Manual (default)
+					<br></br>
+					<input type="radio" name="config" id="server"/> DHCP Server
+					<br></br>
+					<input type="radio" name="config" id="client"/> DHCP Client
+					<br></br>
+					<button type="button" class="btn btn-primary"
+						id="configure button" onclick="setCompanionMode()">
+						Configure </button>
 				</dl>
 			</div>
 		</div>
@@ -296,5 +370,4 @@ socket.on('current ip', function(data) {
 		</div>
 	</div>
 </div>
-
 {% include ../_includes/footer.liquid %}
