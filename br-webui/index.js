@@ -1840,4 +1840,37 @@ io.on('connection', function(socket) {
 		});
 
 	});
+
+	socket.on ('configure-network', function(configuration) {
+		var network_config = configuration.trim();
+		if (network_config==="Server") {
+			logger.log("Companion set to dhcp server");
+
+			child_process.exec(home_dir+'/companion/scripts/config-dhcp-server.sh', function (error, stdout, stderr) {
+				logger.log(stdout + stderr);
+			});
+		} else if (network_config==="Client") {
+			logger.log("Companion set to dhcp client");
+
+			child_process.exec(home_dir+'/companion/scripts/config-dhcp-client.sh', function (error, stdout, stderr) {
+				logger.log(stdout + stderr);
+			});
+		} else if (network_config==="Manual") {
+			logger.log("Companion set to manual");
+
+			child_process.exec(home_dir+'/companion/scripts/config-manual.sh', function (error, stdout, stderr) {
+				logger.log(stdout + stderr);
+			});
+		}
+		logger.log("Done setting");
+	});
+
+	socket.on('get-network-configuration', function() {
+		logger.log("Fetching current network configuration information");
+		
+		child_process.exec(home_dir+'/companion/scripts/get-config.sh', function(error, stdout, stderr) {
+			logger.log("Got network configuration mode:", stdout);
+			socket.emit('current network config', stdout);
+		});
+	});
 });
