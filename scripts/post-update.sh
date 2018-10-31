@@ -1,4 +1,6 @@
 #!/bin/bash
+export DEBIAN_FRONTEND=noninteractive
+
 echo 'STARTING POST UPDATE'
 echo $(printenv)
 
@@ -235,10 +237,42 @@ if ! git remote | grep -q local; then
     git remote add local ~/companion
 fi
 
-sudo sed -i '\%stopscreens%d' ~/.bash_aliases
-echo "alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print \$1}' | xargs kill\"" >> ~/.bash_aliases
+# Check pre-0.0.16 for networking dependencies
+PRE_0_0_16=$(( git rev-list --count --left-right 0.0.16...revert-point || echo 0 ) | cut -f1)
 
-source ~/.bashrc
+if (( $PRE_0_0_16 > 0 )); then
+    echo "Installing isc-dhcp-server"
+    sudo apt-get update --yes
+    sudo apt-get install isc-dhcp-server=4.3.* --yes
+
+    if [ $? -ne 0 ] # If install failed:
+    then
+        echo 'Failed to install isc-dhcp-server; Aborting update'
+        echo 'Rebooting to repair installation, this will take a few minutes'
+        echo 'Please DO NOT REMOVE POWER FROM THE ROV! (until QGC makes a connection again)'
+        sleep 0.1
+        sudo reboot
+    fi
+
+    #Copy network configuration files from Companion directory to respective configuration directories
+    sudo cp /home/pi/companion/params/interfaces-eth0 /etc/network/interfaces.d/
+
+    #Source configuration for dhcp server in the default configuration files
+    sudo sh -c "echo 'include \"/home/pi/companion/params/dhcpd-server.conf\";' >> /etc/dhcp/dhcpd.conf"
+    sudo sh -c "echo '. /home/pi/companion/params/isc-dhcp.conf' >> /etc/default/isc-dhcp-server"
+
+    #Copy default network configuration to user folder
+    cp /home/pi/companion/params/network.conf.default /home/pi/network.conf
+    echo "isc-dhcp-server installed"
+
+    #Delete ip address if present from /boot/cmdline.txt
+    # e.g. sed command removes any ip address with any combination of digits [0-9] between decimal points
+    sudo sed -i -e 's/\s*ip=[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*//' /boot/cmdline.txt
+
+    echo "alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print \$1}' | xargs kill\"" >> ~/.bash_aliases
+
+    source ~/.bashrc
+fi
 
 echo 'Update Complete, refresh your browser'
 
