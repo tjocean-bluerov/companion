@@ -12,7 +12,7 @@ import socket
 import time
 
 from pymavlink import mavutil
-from Ping import PingMessage
+from brping import pingmessage
 
 PARSER = argparse.ArgumentParser(description="Ping1D to mavlink bridge.")
 PARSER.add_argument('--ping',
@@ -43,13 +43,13 @@ def main():
     tboot = time.time()
 
     ## Parser to decode incoming PingMessage
-    ping_parser = PingMessage.PingParser()
+    ping_parser = pingmessage.PingParser()
 
     ## Messages that have the current distance measurement in the payload
     distance_messages = [
-        PingMessage.PING1D_DISTANCE,
-        PingMessage.PING1D_DISTANCE_SIMPLE,
-        PingMessage.PING1D_PROFILE
+        pingmessage.PING1D_DISTANCE,
+        pingmessage.PING1D_DISTANCE_SIMPLE,
+        pingmessage.PING1D_PROFILE
         ]
 
     ## The minimum interval time for distance updates to the autopilot
@@ -75,11 +75,11 @@ def main():
 
     ## Send a request for distance_simple message to ping device
     def send_ping1d_request():
-        data = PingMessage.PingMessage()
-        data.request_id = PingMessage.PING1D_DISTANCE_SIMPLE
+        data = pingmessage.pingmessage()
+        data.request_id = pingmessage.PING1D_DISTANCE_SIMPLE
         data.src_device_id = 0
-        data.packMsgData()
-        ping1d_io.sendto(data.msgData, pingserver)
+        data.pack_msg_data()
+        ping1d_io.sendto(data.msg_data, pingserver)
 
     # some extra information for the DISTANCE_SENSOR mavlink message fields
     min_distance = 20
@@ -125,12 +125,12 @@ def main():
 
         # decode data from ping device, forward to autopilot
         for byte in data:
-            if ping_parser.parseByte(byte) == PingMessage.PingParser.NEW_MESSAGE:
-                if ping_parser.rxMsg.message_id in distance_messages:
+            if ping_parser.parseByte(byte) == pingmessage.PingParser.NEW_MESSAGE:
+                if ping_parser.rx_msg.message_id in distance_messages:
                     last_distance_measurement_time = time.time()
-                    distance = ping_parser.rxMsg.distance
-                    deviceid = ping_parser.rxMsg.src_device_id
-                    confidence = ping_parser.rxMsg.confidence
+                    distance = ping_parser.rx_msg.distance
+                    deviceid = ping_parser.rx_msg.src_device_id
+                    confidence = ping_parser.rx_msg.confidence
                     send_distance_data(distance, deviceid, confidence)
 
 if __name__ == '__main__':
