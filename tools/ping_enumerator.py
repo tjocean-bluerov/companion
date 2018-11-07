@@ -12,6 +12,7 @@ def main():
     """Main function
         Enumerate new ping devices
     """
+    output = ""
     # Remove any previously created links
     try:
         output = subprocess.check_output(["rm", "-rf", "/dev/serial/ping"])
