@@ -6,7 +6,7 @@
     Exits with the number of ping devices detected
 """
 import subprocess
-from Ping import Ping1D
+from brping import Ping1D
 
 def main():
     """Main function
@@ -35,7 +35,7 @@ def main():
         byiddev = "/dev/serial/by-id/" + dev
 
         print("Looking for Ping at %s" % byiddev)
-        new_ping = Ping1D.Ping1D(byiddev)
+        new_ping = Ping1D(byiddev)
 
         if not new_ping.initialize():
             continue
