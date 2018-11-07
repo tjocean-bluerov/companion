@@ -15,8 +15,7 @@
 # we shut down the proxy before communicating with the device
 # then restart the proxy when we are finished
 
-from Ping import Ping1D
-from Ping import PingMessage
+from brping import Ping1D, PingMessage, pingmessage
 import platform
 import time
 import os
@@ -32,7 +31,7 @@ args = parser.parse_args()
 supported_machines = ('x86_64', 'armv7l')
 machine = platform.machine()
 if machine not in supported_machines:
-    print machine, 'cpu architecture is not supported'
+    print(machine, 'cpu architecture is not supported')
     exit(1)
 
 # stop pingproxy
@@ -40,18 +39,18 @@ print("Stopping proxy server...")
 os.system("screen -X -S pingproxy quit")
 
 # Connect to Ping
-myPing = Ping1D.Ping1D(args.device, args.baudrate)
+myPing = Ping1D(args.device, args.baudrate)
 
 # Make sure we have a Ping on the line
 if myPing.initialize() is False:
-    print 'Could not communicate with Ping device!'
+    print('Could not communicate with Ping device!')
     exit(1)
 
 # send ping device to bootloader
 print("Sending device to bootloader...")
-bootloader_msg = PingMessage.PingMessage(PingMessage.PING1D_GOTO_BOOTLOADER)
-bootloader_msg.packMsgData()
-myPing.iodev.write(bootloader_msg.msgData)
+bootloader_msg = PingMessage(pingmessage.PING1D_GOTO_BOOTLOADER)
+bootloader_msg.pack_msg_data()
+myPing.iodev.write(bootloader_msg.msg_data)
 
 #TODO check for ack here
 
