@@ -139,25 +139,20 @@ if ! ssh-keygen -H -F github.com; then
     fi
 fi
 
-cd /home/pi/companion
-echo 'Checking ping-python status...'
-PING_STATUS=$(git submodule status | grep ping-python | head -c 1)
-if [[ ! -z $PING_STATUS && ($PING_STATUS == '+' || $PING_STATUS == '-') ]]; then
-    echo 'ping-python needs update.'
-    git submodule update --recursive -f submodules/ping-python
-    echo 'Installing ping-python...'
-    cd /home/pi/companion/submodules/ping-python
-    sudo python setup.py build install
-    if [ $? -ne 0 ] # If "pip install ping-python" failed:
-    then
-        echo 'Failed to install ping-python; Aborting update'
+# install bluerobotics-ping if neccessary
+if pip list | grep bluerobotics-ping; then
+    echo 'bluerobotics-ping already installed'
+else
+    echo 'installing bluerobotics-ping...'
+    sudo pip install bluerobotics-ping
+    # If "pip install bluerobotics-ping" failed:
+    if [ $? -ne 0 ]; then
+        echo 'Failed to install bluerobotics-ping; Aborting update'
         echo 'Rebooting to repair installation, this will take a few minutes'
         echo 'Please DO NOT REMOVE POWER FROM THE ROV! (until QGC makes a connection again)'
         sleep 0.1
         sudo reboot
     fi
-else
-    echo 'ping-python is up to date.'
 fi
 
 # install pynmea2 if neccessary
