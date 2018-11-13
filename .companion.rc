@@ -15,7 +15,7 @@ done
 if [ ! -f /home/pi/.updating ]; then
 	sudo python $COMPANION_DIR/tools/ping_enumerator.py || true
 	if [ -d /dev/serial/ping ]; then
-		sudo -H -u pi screen -dm -S pingproxy python -m Ping/PingProxy --device $(ls -d /dev/serial/ping/* | head -1)
+		sudo -H -u pi screen -dm -S pingproxy python -m brping/pingproxy --device $(ls -d /dev/serial/ping/* | head -1)
 		# Uncomment the next line to enable Ping1D as a range finder
 		#sudo -H -u pi screen -dm -S pingmav python $COMPANION_DIR/tools/ping1d_mavlink_driver.py
 	fi
