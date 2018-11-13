@@ -42,16 +42,18 @@ def main():
             continue
 
         try:
-            if new_ping.get_device_id() and new_ping.get_fw_version():
+            device_id = new_ping.get_device_id()
+            firmware_version = new_ping.get_firmware_version()
+            if  device_id and firmware_version:
                 # ex Ping1D-id-43-t-1-m-1-v-3.19
                 description = "/dev/serial/ping/Ping1D-id-%s-t-%s-m-%s-v-%s.%s" % (
-                    new_ping._device_id,
-                    new_ping._device_type,
-                    new_ping._device_model,
-                    new_ping._fw_version_major,
-                    new_ping._fw_version_minor
-                    )
-                print("Found Ping1D (ID: %d) at %s" % (new_ping._device_id, dev))
+                device_id["device_id"],
+                firmware_version["device_type"],
+                firmware_version["device_model"],
+                firmware_version["firmware_version_major"],
+                firmware_version["firmware_version_minor"])
+
+                print("Found Ping1D (ID: %d) at %s" % (device_id["device_id"], dev))
 
                 # Follow link to actual device
                 target_device = subprocess.check_output(' '.join(["readlink", "-f", byiddev]), shell=True)
