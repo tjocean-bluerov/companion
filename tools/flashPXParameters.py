@@ -36,6 +36,74 @@ if platform.system() == 'Linux':
 elif platform.system() == 'Darwin':
 	port = '/dev/tty.usbmodem1'
 
+
+if not os.path.exists(port):
+    raise Exception("port does not exist: %s" % port)
+
+master = mavutil.mavlink_connection(port)
+master.wait_heartbeat()
+
+# Reset parameters to firmware defaults
+print "Resetting parameters to defaults.",
+
+master.mav.command_long_send(
+1, # target system
+1, # target component
+mavutil.mavlink.MAV_CMD_PREFLIGHT_STORAGE, # command
+0, # confirmation
+2, # erase
+0,0,0,0,0,0) # unused params
+
+verified = False
+start = time.time()
+while time.time() < start + timeout:
+    msg = master.recv_match()
+    if msg is not None:
+        if msg.get_type() == "COMMAND_ACK" and msg.command == mavutil.mavlink.MAV_CMD_PREFLIGHT_STORAGE and msg.result == mavutil.mavlink.MAV_RESULT_ACCEPTED:
+            print " OK"
+            verified = True
+            break
+    time.sleep(0.01)
+
+if not verified:
+    print " FAIL!"
+    exit(1)
+
+print "Rebooting.",
+
+master.mav.command_long_send(
+1, # target system
+1, # target component
+mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN, # command
+0, # confirmation
+1, # reboot
+0,0,0,0,0,0) # unused params
+
+verified = False
+start = time.time()
+while time.time() < start + timeout:
+    msg = master.recv_match()
+    if msg is not None:
+        if msg.get_type() == "COMMAND_ACK" and msg.command == mavutil.mavlink.MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN and msg.result == mavutil.mavlink.MAV_RESULT_ACCEPTED:
+            print " OK"
+            verified = True
+            break
+    time.sleep(0.01)
+
+if not verified:
+    print " FAIL!"
+    exit(1)
+
+master.close()
+
+print("waiting for %s to drop..." % port)
+while not os.system("ls " + port + " > /dev/null 2>&1"):
+	time.sleep(0.1)
+	
+print("waiting for connection to %s..." % port)
+while os.system("ls " + port + " > /dev/null 2>&1"):
+	time.sleep(0.1)
+
 print "Waiting for heartbeat."
 
 try:
