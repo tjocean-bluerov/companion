@@ -144,7 +144,7 @@ if pip list | grep bluerobotics-ping; then
     echo 'bluerobotics-ping already installed'
 else
     echo 'installing bluerobotics-ping...'
-    sudo pip install bluerobotics-ping
+    sudo pip install bluerobotics-ping==0.0.2
     # If "pip install bluerobotics-ping" failed:
     if [ $? -ne 0 ]; then
         echo 'Failed to install bluerobotics-ping; Aborting update'
