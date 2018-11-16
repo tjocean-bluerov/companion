@@ -13,7 +13,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq rpi-update
 sudo rpi-update
 
 # install python and pip
-sudo apt-get install -y python-dev python-pip python-libxml2
+sudo apt-get install -y python-dev python-pip python-libxml2 python-lxml
 
 # dependencies
 sudo apt-get install -y libxml2-dev libxslt1-dev
