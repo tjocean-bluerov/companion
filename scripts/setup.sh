@@ -10,7 +10,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq
 
 # Update Raspberry Pi
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq rpi-update
-sudo rpi-update -y
+sudo rpi-update
 
 # install python and pip
 sudo apt-get install -y python-dev python-pip python-libxml2
