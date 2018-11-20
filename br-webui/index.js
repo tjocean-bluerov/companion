@@ -776,29 +776,34 @@ function updateCPUStats () {
 
 		// If command fail, return no status
 		if (throttled[0] != "throttled") {
-			cpu_stats.cpu_status = "No status"
+			cpu_stats.cpu_status = "No status!";
 			io.emit('cpu stats', cpu_stats);
 			return;
 		}
 
 		// Decode command
-		throttled_code = parseInt(throttled[1])
-		var throttled_list =
-		[
-			{bit: 18, type: "Throttling has occurred"},
-			{bit: 17, type: "Arm frequency capped has occurred"},
-			{bit: 16, type: "Under-voltage has occurred"},
-			{bit: 2, type: "Currently throttled"},
-			{bit: 1, type: "Currently arm frequency capped"},
-			{bit: 0, type: "Currently under-voltage"}
-		];
+		throttled_code = parseInt(throttled[1]);
 
-		for (i = 0; i < throttled_list.length; i++) {
-			if ((throttled_code >> throttled_list[i].bit) & 1) {
-				if (cpu_stats.cpu_status != "") {
-					cpu_stats.cpu_status += ", "
+		if (!throttled_code) {
+			cpu_stats.cpu_status = "OK";
+		} else {
+			var throttled_list =
+			[
+				{bit: 18, type: "Throttling has occurred"},
+				{bit: 17, type: "Arm frequency capped has occurred"},
+				{bit: 16, type: "Under-voltage has occurred"},
+				{bit: 2, type: "Currently throttled"},
+				{bit: 1, type: "Currently arm frequency capped"},
+				{bit: 0, type: "Currently under-voltage"}
+			];
+
+			for (i = 0; i < throttled_list.length; i++) {
+				if ((throttled_code >> throttled_list[i].bit) & 1) {
+					if (cpu_stats.cpu_status != "") {
+						cpu_stats.cpu_status += ", "
+					}
+					cpu_stats.cpu_status += throttled_list[i].type
 				}
-				cpu_stats.cpu_status += throttled_list[i].type
 			}
 		}
 
