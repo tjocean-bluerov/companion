@@ -814,6 +814,7 @@ function updateCPUStats () {
 
 function getCpuStatus(callback) {
 	var cmd = child_process.exec('vcgencmd get_throttled', function (error, stdout, stderr) {
+		logger.log("Got CPU Status: ", error, stdout, stderr);
 		callback(stdout);
 	});
 }
