@@ -1830,7 +1830,7 @@ io.on('connection', function(socket) {
 	socket.on('set default ip', function(ip) {
 		logger.log("set default ip", ip);
 
-		child_process.exec(home_dir+'/companion/scripts/set_default_client_ip.sh ' + ip, function (error, stdout, stderr) {
+		child_process.exec('echo ' + ip + ' > ' + home_dir + '/static-ip.conf', function (error, stdout, stderr) {
 			logger.log(stdout + stderr);
 		});
 
