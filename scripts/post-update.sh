@@ -266,6 +266,8 @@ if (( $PRE_0_0_16 > 0 )); then
 
     echo "alias stopscreens=\"screen -ls | grep Detached | cut -d. -f1 | awk '{print \$1}' | xargs kill\"" >> ~/.bash_aliases
 
+    echo 192.168.2.2 > /home/pi/static-ip.conf
+
     source ~/.bashrc
 fi
 
