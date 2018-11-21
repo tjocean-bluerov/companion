@@ -5,5 +5,5 @@
 --out udpin:localhost:9000
 --out udpbcast:192.168.2.255:14550
 --mav20
---aircraft ~/tlogs
+--aircraft telemetry
 --streamrate -1
