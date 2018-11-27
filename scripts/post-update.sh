@@ -268,6 +268,12 @@ if (( $PRE_0_0_16 > 0 )); then
 
     echo 192.168.2.2 > /home/pi/static-ip.conf
 
+    # remove any line containing 'enable_uart=' from /boot/config.txt
+    sudo sed -i '/enable_uart=/d' /boot/config.txt
+
+    # append 'enable_uart=1' line to /boot/config.txt
+    echo "enable_uart=1" | sudo tee -a /boot/config.txt
+
     source ~/.bashrc
 fi
 
