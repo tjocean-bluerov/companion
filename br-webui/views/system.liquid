@@ -251,6 +251,7 @@ socket.on('getmav', function(data) {
 	document.getElementById('router').innerHTML = data.router;
 	document.getElementById('nmearx').innerHTML = data.nmearx;
 	document.getElementById('driver').innerHTML = data.driver;
+	document.getElementById('pingproxy').innerHTML = data.pingproxy;
 });
 
 </script>
@@ -298,6 +299,8 @@ socket.on('getmav', function(data) {
                                                 <dd id="web"></dd>
 					<dt>wldriver: </dt>
                                                 <dd id="driver"></dd>
+					<dt>pingproxy: </dt>
+                                                <dd id="pingproxy"></dd>
                                 </dl>
 			</div>
 		</div>

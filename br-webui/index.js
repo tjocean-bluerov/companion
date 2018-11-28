@@ -834,6 +834,7 @@ function givemav(){
 		procstatus.router = stdout.search("commrouter") < 0 ? "Not Running" : "Process Running" ;
 		procstatus.nmearx = stdout.search("nmearx") < 0 ? "Not Running" : "Process Running" ;
 		procstatus.driver = stdout.search("wldriver") < 0 ? "Not Running" : "Process Running" ;
+		procstatus.pingproxy = stdout.search("pingproxy") < 0 ? "Not Running" : "Process Running" ;
 		
 		logger.log(stdout+stderr);
 
