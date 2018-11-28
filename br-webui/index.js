@@ -838,15 +838,27 @@ function givemav(){
 		
 		logger.log(stdout+stderr);
 
+		// TODO clean this up, set the font colors/messages in one step after flags have been collected
 		// Check if pixhawk is connected or not 
 		var cmd1 = child_process.exec('ls /dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00', function (error, stdout, stderr) {
 			// If not show the respective error messages
 			if (error) {
-				if (procstatus.mav.search("Process Running") >= 0) {
-					procstatus.mav = procstatus.mav.fontcolor("green") + status + ("Pixhawk is unplugged").fontcolor("red");
-				} else {
-					procstatus.mav = procstatus.mav.fontcolor("red") + status + ("Pixhawk is unplugged").fontcolor("red");
-				}
+				child_process.exec('ls /dev/serial/by-id/usb-3D_Robotics_PX4_BL_FMU_v2.x_0-if00', function (error, stdout, stderr) {
+					if (error) {
+						if (procstatus.mav.search("Process Running") >= 0) {
+							procstatus.mav = procstatus.mav.fontcolor("green") + status + ("Pixhawk is unplugged").fontcolor("red");
+						} else {
+							procstatus.mav = procstatus.mav.fontcolor("red") + status + ("Pixhawk is unplugged").fontcolor("red");
+						}
+					} else {
+						if (procstatus.mav.search("Process Running") >= 0) {
+							procstatus.mav = procstatus.mav.fontcolor("green") + status + ("Pixhawk is in bootloader").fontcolor("red");
+						} else {
+							procstatus.mav = procstatus.mav.fontcolor("red") + status + ("Pixhawk is in bootloader").fontcolor("red");
+						}
+					}
+				});
+
 				io.emit('getmav', procstatus);
 			// If it is connected, show the respective 'okay' status messages			
 			} else {
