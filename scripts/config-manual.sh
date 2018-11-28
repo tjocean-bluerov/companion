@@ -2,6 +2,7 @@
 
 #copy the configuration information to network-conf.txt
 echo "config-manual" > /home/pi/network.conf
+echo 192.168.2.2 > /home/pi/static-ip.conf
 
 #Bring down interface eth0
 sudo ifdown eth0
