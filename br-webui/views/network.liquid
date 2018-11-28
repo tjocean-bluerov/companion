@@ -226,31 +226,32 @@ socket.on("current network config", function(data) {
 // Set companion network configuration according to the option selected by user
 function setCompanionMode() {
 	if (document.getElementById("manual").checked) {
-		if (confirm("Are you sure you want to configure Companion \
-as the default Manual mode? The system will automatically reboot for \
-reconfiguration")) {
+		if (confirm("Are you sure you want to configure the Companion Ethernet interface in Manual mode? The system " +
+		"will automatically reboot for reconfiguration. The static IP address will be 192.168.2.2 after reboot. " +
+		"CLICKING OK MAY RENDER THE SYSTEM UNUSABLE. IF YOU ARE NOT SURE OF WHAT YOU ARE DOING, CLICK CANCEL!")) {
 			socket.emit("configure-network", "Manual");
-			alert("Companion has been configured to manual mode. The pi will \
-restart in a few seconds. Do not interrupt the configuration process and make \
-sure the pi remains plugged in to a power supply. Please refer to Network \
-Setup instructions to regain connection with your Pi.");
+			alert("The Companion Ethernet interface has been configured in Manual mode. The Companion computer will " +
+			"restart in a few seconds. Do not interrupt the configuration process and make sure the Companion " +
+			"computer remains plugged in to a power supply. The static IP address will be 192.168.2.2 after reboot.");
 		}
 	} else if (document.getElementById("server").checked) {
-		if (confirm("Are you sure you want to configure Companion \
-as a DHCP server? The system will automatically reboot for reconfiguration")) {
+		if (confirm("Are you sure you want to configure the Companion Ethernet interface as a DHCP server? The " +
+		"system will automatically reboot for reconfiguration. CLICKING OK MAY RENDER THE SYSTEM UNUSABLE. IF " +
+		"YOU ARE NOT SURE OF WHAT YOU ARE DOING, CLICK CANCEL!")) {
 			socket.emit("configure-network", "Server");
-			alert("Companion has been configured as DHCP server. The pi will \
-restart in a few seconds. Do not interrupt the configuration process and make \
-sure the pi remains plugged in to a power supply.");
+			alert("Companion has been configured as DHCP server. The Companion computer will restart in a few " +
+			"seconds. Do not interrupt the configuration process and make sure the Companion computer remains " +
+			"plugged in to a power supply.");
 		}
 	} else if (document.getElementById("client").checked) {
-		if (confirm("Are you sure you want to configure Companion \
-as a DHCP client? The system will automatically reboot for reconfiguration")) {
+		if (confirm("Are you sure you want to configure the Companion Ethernet interface as a DHCP client? The " +
+		"system will automatically reboot for reconfiguration. CLICKING OK MAY RENDER THE SYSTEM UNUSABLE. IF YOU " +
+		"ARE NOT SURE OF WHAT YOU ARE DOING, CLICK CANCEL!")) {
 			socket.emit("configure-network", "Client");
-			alert("Companion has been configured as DHCP client. The pi will \
-restart in a few seconds. Do not interrupt the configuration process and make \
-sure the pi remains plugged in to a power supply. Find out the respective new \
-IP address for the pi to reconnect.");
+			alert("Companion has been configured as DHCP client. The Companion computer will restart in a few " +
+			"seconds. Do not interrupt the configuration process and make sure the Companion computer remains " +
+			"plugged in to a power supply. Log into the DHCP server (usually router) to find the IP address of " +
+			"the Companion computer.");
 		}
 	}
 }
@@ -319,13 +320,22 @@ socket.on('current ip', function(data) {
 						Change Companion Default Ethernet IP</button>
 				</dl>
 				<dl class="dl-horizontal">
-					<h4> Current Configuration: <span id="current-config"></span></h4>
-					<h4 id="configure"> Companion Network Settings: </h4>
-					<input type="radio" name="config" id="manual"/> Manual (default)
-					<br></br>
-					<input type="radio" name="config" id="server"/> DHCP Server
-					<br></br>
-					<input type="radio" name="config" id="client"/> DHCP Client
+					<h3> Current Configuration: <span id="current-config"></span></h3>
+					<h3 id="configure"> Companion Network Settings: </h3>
+					<h4><input type="radio" name="config" id="manual"/> Manual (default)</h4>
+					<b>&emsp;&emsp;The IP address is manually assigned to the Ethernet interface. This is known as a 
+					"static IP address" because the IP address will not change on it's own. The default IP address 
+					for Companion is 192.168.2.2</b>
+					<h4><input type="radio" name="config" id="server"/> DHCP Server</h4>
+					<b>&emsp;&emsp;DHCP Server mode is useful for connecting the ROV to many computers without 
+					reconfiguring each computer’s network options. In this mode, the Companion computer will have a 
+					static IP address of 192.168.2.2, and will lease out only a single IP (192.168.2.1) to a single 
+					connected client. Only one client is supported at the moment.</b>
+					<h4><input type="radio" name="config" id="client"/> DHCP Client</h4>
+					<b>&emsp;&emsp;DHCP Client mode is useful for connecting the ROV to a network through a router. 
+					The Companion computer will need to be connected to a DHCP server (like a router) on the network 
+					to be assigned an IP address. Log into your router to find/configure the IP address that is 
+					assigned to the Companion computer.</b>
 					<br></br>
 					<button type="button" class="btn btn-primary"
 						id="configure button" onclick="setCompanionMode()">
