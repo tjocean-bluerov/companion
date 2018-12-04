@@ -253,7 +253,10 @@ if (( $PRE_0_0_16 > 0 )); then
     sudo cp /home/pi/companion/params/interfaces-eth0 /etc/network/interfaces.d/
 
     #Source configuration for dhcp server in the default configuration files
+    sudo sed -i '\%/home/pi/companion/%d' /etc/dhcp/dhcpd.conf
     sudo sh -c "echo 'include \"/home/pi/companion/params/dhcpd-server.conf\";' >> /etc/dhcp/dhcpd.conf"
+
+    sudo sed -i '\%/home/pi/companion/%d' /etc/default/isc-dhcp-server
     sudo sh -c "echo '. /home/pi/companion/params/isc-dhcp.conf' >> /etc/default/isc-dhcp-server"
 
     #Copy default network configuration to user folder
