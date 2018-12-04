@@ -1,18 +1,24 @@
 #Add cofiguration mapping for interface eth0
-auto eth0
+
 allow-hotplug eth0
 mapping eth0
     script /home/pi/companion/scripts/eth0-mapping-config.sh
 
 #Add network configuration settings for Manual mode
 iface config-manual inet manual
+    pre-up service isc-dhcp-server stop
     up ifconfig $IFACE inet $(cat /home/pi/static-ip.conf) || ifconfig $IFACE inet 192.168.2.2
+    down ifconfig $IFACE 0.0.0.0
     down ifconfig $IFACE down
 
 #Add network configuration settings for DHCP Server 
 iface config-server inet static
+    pre-up service isc-dhcp-server stop
+    post-up service isc-dhcp-server start
+    pre-down service isc-dhcp-server stop
     address 192.168.2.2
     netmask 255.255.255.0
 
 #Add network configuration settings for DHCP Client
 iface config-client inet dhcp
+    pre-up service isc-dhcp-server stop
