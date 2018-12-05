@@ -1864,24 +1864,30 @@ io.on('connection', function(socket) {
 		var network_config = configuration.trim();
 		if (network_config==="Server") {
 			logger.log("Companion set to dhcp server");
-
-			child_process.exec(home_dir+'/companion/scripts/config-dhcp-server.sh', function (error, stdout, stderr) {
-				logger.log(stdout + stderr);
-			});
+			var cmd = child_process.spawn(home_dir + '/companion/scripts/config-dhcp-server.sh');
 		} else if (network_config==="Client") {
 			logger.log("Companion set to dhcp client");
-
-			child_process.exec(home_dir+'/companion/scripts/config-dhcp-client.sh', function (error, stdout, stderr) {
-				logger.log(stdout + stderr);
-			});
+			var cmd = child_process.spawn(home_dir + '/companion/scripts/config-dhcp-client.sh');
 		} else if (network_config==="Manual") {
 			logger.log("Companion set to manual");
-
-			child_process.exec(home_dir+'/companion/scripts/config-manual.sh', function (error, stdout, stderr) {
-				logger.log(stdout + stderr);
-			});
+			var cmd = child_process.spawn(home_dir + '/companion/scripts/config-manual.sh');
 		}
-		logger.log("Done setting");
+
+		cmd.stdout.on('data', function (data) {
+			logger.log(data.toString());
+		});
+
+		cmd.stderr.on('data', function (data) {
+			logger.error(data.toString());
+		});
+
+		cmd.on('error', function (error) {
+			logger.error("Configure network error: " + error.toString());
+		});
+
+		cmd.on('exit', function (code) {
+			logger.log("Done configuring network with exit code " + code.toString());
+		});
 	});
 
 	socket.on('get-network-configuration', function() {
