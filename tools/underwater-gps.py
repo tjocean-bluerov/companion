@@ -6,10 +6,93 @@ import json
 import argparse
 import grequests
 from pymavlink import mavutil
-
+from datetime import datetime
 from os import system
+import operator
+
+# Nmea messages templates
+# https://www.trimble.com/oem_receiverhelp/v4.44/en/NMEA-0183messages_GGA.html
+gpgga = ("$GPGGA,"                                    # Message ID
+       + "{hours:02d}{minutes:02d}{seconds:02.4f},"   # UTC Time
+       + "{lat:02.0f}{latmin:02.6f},"                 # Latitude (degrees + minutes)
+       + "{latdir},"                                  # Latitude direction (N/S)
+       + "{lon:03.0f}{lonmin:02.6},"                  # Longitude (degrees + minutes)
+       + "{londir},"                                  # Longitude direction (W/E)
+       + "1,"                                         # Fix? (0-5)
+       + "06,"                                        # Number of Satellites
+       + "1.2,"                                       # HDOP
+       + "0,"                                         # MSL altitude
+       + "M,"                                         # MSL altitude unit (Meters)
+       + "0,"                                         # Geoid separation
+       + "M,"                                         # Geoid separation unit (Meters)
+       + "00,"                                        # Age of differential GPS data, N/A
+       + "0000"                                       # Age of differential GPS data, N/A
+       + "*")                                         # Checksum
+
+# https://www.trimble.com/oem_receiverhelp/v4.44/en/NMEA-0183messages_RMC.html
+gprmc = ("$GPRMC,"                                  # Message ID
+       + "{hours:02d}{minutes:02d}{seconds:02.4f}," # UTC Time
+       + "A,"                                       # Status A=active or V=void
+       + "{lat:02.0f}{latmin:02.6f},"               # Latitude (degrees + minutes)
+       + "{latdir},"                                # Latitude direction (N/S)
+       + "{lon:03.0f}{lonmin:02.6},"                # Longitude (degrees + minutes)
+       + "{londir},"                                # Longitude direction (W/E)
+       + "0.0,"                                     # Speed over the ground in knots
+       + "{orientation:03.2f},"                     # Track angle in degrees
+       + "{date},"                                  # Date
+       + ","                                        # Magnetic variation in degrees
+       + ","                                        # Magnetic variation direction
+       + "A"                                        # A=autonomous, D=differential,
+                                                    # E=Estimated, N=not valid, S=Simulator.
+       + "*")                                       # Checksum
+
+# https://www.trimble.com/oem_receiverhelp/v4.44/en/NMEA-0183messages_VTG.html
+gpvtg = ("$GPVTG,"                    # Message ID
+       + "{orientation:03.2f},"       # Track made good (degrees true)
+       + "T,"                         # T: track made good is relative to true north
+       + ","                          # Track made good (degrees magnetic)1
+       + "M,"                         # M: track made good is relative to magnetic north
+       + "0.0,"                       # Speed, in knots
+       + "N,"                         # N: speed is measured in knots
+       + "0.0,"                       # Speed over ground in kilometers/hour (kph)
+       + "K,"                         # K: speed over ground is measured in kph
+       + "A"                          # A=autonomous, D=differential,
+                                      # E=Estimated, N=not valid, S=Simulator.
+       + "*")                         # Checksum
+
+def calculateNmeaChecksum(string):
+    """
+    Calculates the checksum of an Nmea string
+    """
+    data, checksum = string.split("*")
+    calculated_checksum = reduce(operator.xor, bytearray(data[1:]), 0)
+    return calculated_checksum
+
+def format(message, now=0, lat=0, lon=0, orientation=0):
+    """
+    Formats data into nmea message
+    """
+    now = datetime.now()
+    latdir = "N" if lat > 0 else "S"
+    londir = "E" if lon > 0 else "W"
+    lat = abs(lat)
+    lon = abs(lon)
+
+    msg = message.format(date=now.strftime("%d%m%y"),
+                       hours=now.hour,
+                       minutes=now.minute,
+                       seconds=(now.second + now.microsecond/1000000.0),
+                       lat=lat,
+                       latmin=(lat % 1) * 60,
+                       latdir=latdir,
+                       lon=lon,
+                       lonmin=(lon % 1) * 60,
+                       londir=londir,
+                       orientation=orientation)
+    return msg +  ("%02x\r\n" % calculateNmeaChecksum(msg)).upper()
 
 
+# Old mavlink link, used in BR QGC up to 3.2.4-rev6
 master = mavutil.mavlink_connection('udpout:192.168.2.1:14400', source_system=2, source_component=1)
 
 parser = argparse.ArgumentParser(description="Driver for the Water Linked Underwater GPS system.")
@@ -17,6 +100,10 @@ parser.add_argument('--ip', action="store", type=str, default="demo.waterlinked.
 parser.add_argument('--port', action="store", type=str, default="80", help="remote port to query on.")
 args = parser.parse_args()
 
+# New approach, UDP port 14401 for nmea data
+qgcNmeaSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+qgcNmeaSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+qgcNmeaSocket.setblocking(0)
 
 connected = False
 while not connected:
@@ -38,6 +125,8 @@ gpsUrl = "http://" + args.ip + ":" + args.port
 def processMasterPosition(response, *args, **kwargs):
     print('got master response:', response.text)
     result = response.json()
+
+    # Old approach, mavlink messages to port 14400
     master.mav.heartbeat_send(
         0,                     # type                      : Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM) (uint8_t)
         1,                     # autopilot                 : Autopilot type / class. defined in MAV_AUTOPILOT ENUM (uint8_t)
@@ -66,7 +155,16 @@ def processMasterPosition(response, *args, **kwargs):
         0,                     # alt                       : Current altitude (MSL), in meters (float)
         0                      # climb                     : Current climb rate in meters/second (float)
     )
-    
+
+    # new approach: nmea messages to port 14401
+    try:
+        result = response.json()
+        for message in [gpgga, gprmc, gpvtg]:
+            msg = format(message, datetime.now(), result['lat'], result['lon'], orientation=result['orientation'])
+            qgcNmeaSocket.sendto(msg, ('192.168.2.1', 14401))
+    except Exception as e:
+        print(e)
+
 def processLocatorPosition(response, *args, **kwargs):
     print('got global response:', response.text)
     result = response.json()
