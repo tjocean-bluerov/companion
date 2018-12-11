@@ -14,6 +14,7 @@ iface config-manual inet manual
 #Add network configuration settings for DHCP Server 
 iface config-server inet static
     pre-up service isc-dhcp-server stop
+    pre-up rm /var/lib/dhcpd/dhcpd.leases || true
     post-up service isc-dhcp-server start
     pre-down service isc-dhcp-server stop
     address 192.168.2.2
