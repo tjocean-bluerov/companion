@@ -277,6 +277,9 @@ if (( $PRE_0_0_16 > 0 )); then
     # append 'enable_uart=1' line to /boot/config.txt
     echo "enable_uart=1" | sudo tee -a /boot/config.txt
 
+    # override start timeout for networking service to prevent hang at boot in certain misconfiguraitons
+    sudo mkdir -p /etc/systemd/system/networking.service.d
+    sudo sh -c "echo '[Service]\nTimeoutStartSec=10' > /etc/systemd/system/networking.service.d/timeout.conf"
 fi
 
 echo 'Update Complete, refresh your browser'
