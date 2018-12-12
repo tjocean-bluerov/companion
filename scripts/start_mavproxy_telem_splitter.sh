@@ -1,4 +1,4 @@
-# this starts mavproxy so that the serial link to the companion computer (on /dev/ttyACM0)
+# this starts mavproxy so that the serial link to the companion computer
 # is available to a companion computer and external GCSs via UDP. This broadcasts so that
 # multiple IP addresses can receive the telemetry.
 
