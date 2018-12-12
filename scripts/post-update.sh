@@ -277,7 +277,6 @@ if (( $PRE_0_0_16 > 0 )); then
     # append 'enable_uart=1' line to /boot/config.txt
     echo "enable_uart=1" | sudo tee -a /boot/config.txt
 
-    source ~/.bashrc
 fi
 
 echo 'Update Complete, refresh your browser'
