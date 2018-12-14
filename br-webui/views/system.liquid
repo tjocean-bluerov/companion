@@ -316,12 +316,8 @@ socket.on('cpu stats', function(data) {
             deviceContent.removeChild(deviceContent.lastChild);
         }
 
-        var sectionHeading = document.createElement("h3");
-        sectionHeading.innerHTML = "Detected Devices:";
-        deviceContent.appendChild(sectionHeading);
-
         for (deviceType in companionDevices) {
-            var h = document.createElement("h4");
+            var h = document.createElement("h5");
             h.innerHTML = deviceType + " Devices:";
 
             var ul = document.createElement("ul");
@@ -395,8 +391,6 @@ socket.on('cpu stats', function(data) {
             screenContent.removeChild(screenContent.lastChild);
         }
         for (user in companionScreens) {
-            var h = document.createElement("h3");
-            h.innerHTML = "Services running for user " + user + ":";
             var ul = document.createElement("ul");
             for (screen in companionScreens[user])
             {
@@ -406,7 +400,6 @@ socket.on('cpu stats', function(data) {
 
                 ul.appendChild(li);
             }
-            screenContent.appendChild(h);
             screenContent.appendChild(ul);
         }
     }
@@ -447,13 +440,42 @@ socket.on('cpu stats', function(data) {
 					<dt>CPU Status: </dt>
 						<dd id="cpuStatus"></dd>
 				</dl>
-            <div id="screenContent"></div>
-            <div id="deviceContent"></div>
             </div>
         </div>
     </div>
 </div>
-
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					Active Services
+				</h3>
+			</div>
+			<div class="panel-body">
+				<dl class="dl-horizontal">
+					<div id="screenContent"></div>
+				</dl>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					Detected Devices
+				</h3>
+			</div>
+			<div class="panel-body">
+				<dl class="dl-horizontal">
+            		<div id="deviceContent"></div>
+				</dl>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel panel-default">
