@@ -771,9 +771,9 @@ networking.on('connection', function(socket) {
 });
 
 function updateInternetStatus(should_log) {
-	var cmd = child_process.exec('ping -c1 google.com', function (error, stdout, stderr) {
+	var cmd = child_process.exec('ping -c1 fast.com', function (error, stdout, stderr) {
 		if (should_log) {
-			logger.log("ping -c1 google.com : ", error + stdout + stderr);
+			logger.log("ping -c1 fast.com : ", error + stdout + stderr);
 		}
 		if (error) {
 			_internet_connected = false;
