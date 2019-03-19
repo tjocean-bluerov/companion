@@ -328,10 +328,14 @@
 						option.innerHTML = menuItem;
 						option.value = i;
 						new_element.appendChild(option);
+						if (control.value === i) {
+							// Set selected option to the current one (we can't use 'i' here because empty options are skipped)
+							new_element.selectedIndex = new_element.children.length - 1;
+						}
 					}
 					i = i + 1;
 				});
-				
+
 				new_element.onchange = function(data) {
 					control.value = new_element.value;
 					console.log('set v4l2 control', new_element.name, new_element.id, new_element.value);
@@ -341,7 +345,7 @@
 						value: new_element.value
 					});
 				}
-				new_element.selectedIndex = control.value;
+
 			} else if (control.type == "class") {
 				h5.innerHTML = "";
 				new_element = document.createElement("h4");
