@@ -75,13 +75,13 @@ os.system("screen -X -S mavproxy quit")
 print "Flashing Pixhawk..."
 if options.file is not None:
     if(os.system("python -u " + home + "/companion/tools/px_uploader.py --port "
-    "/dev/serial/by-id/usb-3D_Robotics_PX4_BL_FMU_v2.x_0-if00,/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00 "
+    "/dev/serial/by-id/usb-3D_Robotics_PX4_BL_FMU_v2.x_0-if00,/dev/autopilot "
     "'%s'" % options.file) != 0):
                 print "Error flashing pixhawk!"
                 exit(1)
 else:
     if(os.system("python -u "+home+"/companion/tools/px_uploader.py --port "
-    "/dev/serial/by-id/usb-3D_Robotics_PX4_BL_FMU_v2.x_0-if00,/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00 "
+    "/dev/serial/by-id/usb-3D_Robotics_PX4_BL_FMU_v2.x_0-if00,/dev/autopilot "
     "/tmp/ArduSub-v2.px4") != 0):
                 print "Error flashing pixhawk! Do you have most recent version of companion? Try 'git pull' or scp."
                 exit(1)
