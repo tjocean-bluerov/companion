@@ -32,7 +32,7 @@ os.system("screen -X -S mavproxy quit")
 # Port settings
 port = ''
 if platform.system() == 'Linux':
-    port = '/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00'
+    port = '/dev/autopilot'
 elif platform.system() == 'Darwin':
     port = '/dev/tty.usbmodem1'
 
