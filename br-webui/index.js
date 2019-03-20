@@ -1497,7 +1497,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('reboot px', function(data) {
-		var bash = "`timeout 5 mavproxy.py --master=/dev/serial/by-id/usb-3D_Robotics_PX4_FMU_v2.x_0-if00 --cmd=\"reboot;\"`&"
+		var bash = "`timeout 5 mavproxy.py --master=/dev/autopilot --cmd=\"reboot;\"`&"
 		child_process.exec(bash);
 		socket.emit('reboot px complete');
 	});
