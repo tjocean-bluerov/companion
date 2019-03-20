@@ -88,4 +88,7 @@ if [ "$1" = "gst" ]; then
     $HOME/companion/scripts/setup_gst.sh
 fi
 
+# Copy udev rules
+sudo cp $HOME/companion/params/100.autopilot.rules /etc/udev/rules.d/
+
 sudo reboot now
