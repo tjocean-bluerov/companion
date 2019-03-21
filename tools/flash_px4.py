@@ -48,7 +48,7 @@ else:
                                 firmwareURL = options.url
                                 print "Downloading ArduSub firmware from %s" % firmwareURL
                 elif options.latest:
-                                firmwareURL = "http://firmware.ardupilot.org/Sub/latest/PX4/ArduSub-v2.px4"
+                                firmwareURL = "http://firmware.ardupilot.org/Sub/latest/fmuv2/ardusub.apj"
                                 print "Downloading latest ArduSub firmware from %s" % firmwareURL
                 else:
                                 firmwareURL = "http://firmware.ardupilot.org/Sub/stable/PX4/ArduSub-v2.px4"
