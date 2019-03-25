@@ -33,6 +33,9 @@ git -c user.name="companion-update" -c user.email="companion-update" stash
 echo 'tagging revert-point as' $(git rev-parse HEAD)
 git tag revert-point -f
 
+echo 'Check for local changes to save.'
+git stash
+
 if [ -z "$3" ]; then
     echo 'using branch reference'
     git fetch $REMOTE
