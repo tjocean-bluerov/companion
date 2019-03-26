@@ -139,20 +139,15 @@ if ! ssh-keygen -H -F github.com; then
     fi
 fi
 
-# install bluerobotics-ping if neccessary
-if pip list | grep bluerobotics-ping; then
-    echo 'bluerobotics-ping already installed'
-else
-    echo 'installing bluerobotics-ping...'
-    sudo pip install bluerobotics-ping==0.0.2
-    # If "pip install bluerobotics-ping" failed:
-    if [ $? -ne 0 ]; then
-        echo 'Failed to install bluerobotics-ping; Aborting update'
-        echo 'Rebooting to repair installation, this will take a few minutes'
-        echo 'Please DO NOT REMOVE POWER FROM THE ROV! (until QGC makes a connection again)'
-        sleep 0.1
-        sudo reboot
-    fi
+sudo pip install bluerobotics-ping==0.0.7
+
+# If "pip install bluerobotics-ping" failed:
+if [ $? -ne 0 ]; then
+    echo 'Failed to install bluerobotics-ping; Aborting update'
+    echo 'Rebooting to repair installation, this will take a few minutes'
+    echo 'Please DO NOT REMOVE POWER FROM THE ROV! (until QGC makes a connection again)'
+    sleep 0.1
+    sudo reboot
 fi
 
 # install pynmea2 if neccessary
