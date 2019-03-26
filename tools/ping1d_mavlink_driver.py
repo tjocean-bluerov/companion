@@ -12,7 +12,9 @@ import socket
 import time
 
 from pymavlink import mavutil
-from brping import pingmessage
+from brping import PingMessage
+from brping import PingParser
+from brping import PING1D_DISTANCE, PING1D_DISTANCE_SIMPLE, PING1D_PROFILE
 
 PARSER = argparse.ArgumentParser(description="Ping1D to mavlink bridge.")
 PARSER.add_argument('--ping',
@@ -43,13 +45,13 @@ def main():
     tboot = time.time()
 
     ## Parser to decode incoming PingMessage
-    ping_parser = pingmessage.PingParser()
+    ping_parser = PingParser()
 
     ## Messages that have the current distance measurement in the payload
     distance_messages = [
-        pingmessage.PING1D_DISTANCE,
-        pingmessage.PING1D_DISTANCE_SIMPLE,
-        pingmessage.PING1D_PROFILE
+        PING1D_DISTANCE,
+        PING1D_DISTANCE_SIMPLE,
+        PING1D_PROFILE
         ]
 
     ## The minimum interval time for distance updates to the autopilot
@@ -75,8 +77,8 @@ def main():
 
     ## Send a request for distance_simple message to ping device
     def send_ping1d_request():
-        data = pingmessage.pingmessage()
-        data.request_id = pingmessage.PING1D_DISTANCE_SIMPLE
+        data = PingMessage()
+        data.request_id = PING1D_DISTANCE_SIMPLE
         data.src_device_id = 0
         data.pack_msg_data()
         ping1d_io.sendto(data.msg_data, pingserver)
@@ -95,10 +97,10 @@ def main():
             distance = 0
 
         autopilot_io.mav.distance_sensor_send(
-            (time.time() - tboot) * 1000, # time_boot_ms
+            int((time.time() - tboot) * 1000), # time_boot_ms
             min_distance, # min_distance
             max_distance, # max_distance
-            distance/10, # distance
+            int(distance/10), # distance
             sensor_type, # type
             deviceid, # device id
             orientation,
@@ -121,11 +123,12 @@ def main():
             # check if it's waiting for data
             if exception.errno != errno.EAGAIN:
                 raise exception
-
+            else:
+                continue
 
         # decode data from ping device, forward to autopilot
         for byte in data:
-            if ping_parser.parseByte(byte) == pingmessage.PingParser.NEW_MESSAGE:
+            if ping_parser.parse_byte(byte) == PingParser.NEW_MESSAGE:
                 if ping_parser.rx_msg.message_id in distance_messages:
                     last_distance_measurement_time = time.time()
                     distance = ping_parser.rx_msg.distance
