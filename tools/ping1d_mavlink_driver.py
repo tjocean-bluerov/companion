@@ -32,7 +32,7 @@ PARSER.add_argument('--mavlink',
 PARSER.add_argument('--min-confidence',
                     action="store",
                     type=int,
-                    default=50,
+                    default=0,
                     help="Minimum acceptable confidence percentage for depth measurements.\""
                     )
 ARGS = PARSER.parse_args()
