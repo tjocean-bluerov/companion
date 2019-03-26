@@ -282,6 +282,13 @@ if (( $PRE_0_0_16 > 0 )); then
     sudo sh -c "echo '[Service]\nTimeoutStartSec=10' > /etc/systemd/system/networking.service.d/timeout.conf"
 fi
 
+# Check pre-0.0.17 to copy udev files
+PRE_0_0_17=$(( git rev-list --count --left-right 0.0.17...revert-point || echo 0 ) | cut -f1)
+
+if (( $PRE_0_0_17 > 0 )); then
+    sudo cp $HOME/companion/params/100.autopilot.rules /etc/udev/rules.d/
+fi
+
 echo 'Update Complete, refresh your browser'
 
 sleep 0.1
