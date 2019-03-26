@@ -55,7 +55,7 @@ def main():
         ]
 
     ## The minimum interval time for distance updates to the autopilot
-    ping_interval_ms = 0.1
+    ping_interval_ms = 0.075
 
     ## The last time a distance measurement was received
     last_distance_measurement_time = 0
