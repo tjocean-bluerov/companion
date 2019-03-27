@@ -55,10 +55,7 @@ if [ $? != 0 ]; then
 else
     echo "starting device $DEVICE with width $WIDTH height $HEIGHT framerate $FRAMERATE options $gstOptions"
     bash -c "export LD_LIBRARY_PATH=/usr/local/lib/ && gst-launch-1.0 -v v4l2src device=$DEVICE do-timestamp=true ! video/x-h264, width=$WIDTH, height=$HEIGHT, framerate=$FRAMERATE/1 $gstOptions"
-    # save video format settings
-    echo $WIDTH > ~/vidformat.param
-    echo $HEIGHT >> ~/vidformat.param
-    echo $FRAMERATE >> ~/vidformat.param
-    echo $DEVICE >> ~/vidformat.param
+    # if we make it this far, it means the gst pipeline failed, so load the backup settings
+    cp ~/vidformat.param.bak ~/vidformat.param && rm ~/vidformat.param.bak
 fi
 
