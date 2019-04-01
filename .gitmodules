@@ -1,6 +1,6 @@
 [submodule "submodules/MAVProxy"]
 	path = submodules/MAVProxy
-	url = https://github.com/bluerobotics/MAVProxy.git
+	url = https://github.com/tjocean-bluerov/MAVProxy.git
 [submodule "submodules/mavlink"]
 	path = submodules/mavlink
-	url = https://github.com/bluerobotics/mavlink.git
+	url = https://github.com/tjocean-bluerov/mavlink.git
