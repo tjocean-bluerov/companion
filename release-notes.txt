@@ -1,0 +1,59 @@
+0.0.7:
+
+Initial release
+
+- Setup/configuration on port 2770
+- WiFi Setup
+- Flash Pixhawk
+- Companion updates
+- Communications routing
+- Raspberry Pi Camera configuration
+- Filesystem access on port 7777
+- Terminal access on port 8088
+
+0.0.8:
+
+- Various bugfixes
+- Don't include -roi option in camera configuration ui
+- Network diagnostics: bandwidth, latency
+- CPU and ram usage monitoring
+- Lockout functions requiring internet when not available
+- Git remote configuration
+- Support for NMEA sentence input on port 27000
+- Support for json-formatted gps input on port 25100
+- Support for Water Linked Underwater GPS system
+- Allow adjusting/saving camera configuration used at boot
+- Factory firmware and parameter reset
+- Change the default password from 'raspberry' to 'companion'
+
+0.0.9:
+
+- Bugfix for determining hardware type before expanding filesystem on first boot
+
+0.0.10:
+
+- Update post-sideload.sh for zipped updates
+
+0.0.11:
+
+- Add CPU load, RAM usage, and throttling status to /system page
+- Add password change functionality at /security
+- Output ROV heading to Water Linked system
+- Add support for RMC, GLL, and GNS NMEA sentences to USBL/GPS input parser
+- Add reboot pixhawk button on /system page
+- Move wifi setup to /network page
+- Display current wifi and ethernet IP addresses in /network page
+- Allow changing default static ip address on ethernet interface in /network page
+- Remove latency testing from /network page, it was unreliable
+- Auto-detect/auto-start Water Linked Underwater GPS driver
+- Bugfix some broken pages on Internet Explorer
+- Remove audio streaming easter egg from web interface, and stream audio via RTP on port 5601
+- Update default ArduSub firmware and parameters to 3.5.2
+- Add Mavproxy configuration to /mavproxy
+- New and improved camera configuration options. It is easy to select video source, framerate, resolution and all user-adjustable camera parameters.
+- Generic support for UVC-compliant, H.264 capable usb video cameras
+- Many various bugfixes and usability improvements
+
+0.0.12:
+
+- Bugfix broken select elements on camera page

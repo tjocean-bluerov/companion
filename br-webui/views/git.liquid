@@ -1,0 +1,354 @@
+{% include ../_includes/header.liquid %}
+
+<script>
+var gitsetup = io('/gitsetup');
+
+var _refs = null;
+var _choiceElement = null;
+
+gitsetup.on('terminal output', function(data) {
+	var terminalEl = document.getElementById("terminal-output");
+	var html = terminalEl.innerHTML + data;
+	var autoscroll = terminalEl.scrollHeight - terminalEl.scrollTop
+		=== terminalEl.clientHeight;
+	terminalEl.innerHTML = html.replace(/\n.*?\r/g, "\n");
+	if (autoscroll) {
+		terminalEl.scrollTop = terminalEl.scrollHeight;
+	}
+});
+
+socket.on('current HEAD', setHEAD);
+
+
+function authenticate(remote) {
+	console.log('authenticating', remote);
+	
+	username = prompt("Enter a username for " + _refs.remotes[remote].url, "");
+	password = prompt("Enter a password for " + _refs.remotes[remote].url, "");
+	
+	if (!username || !password) {
+		console.log("missing credentials!");
+		return;
+	}
+	
+	gitsetup.emit('credentials', {
+		'remote' : remote,
+		'username' : username,
+		'password' : password
+	});
+}
+
+function setHEAD(head) {
+	document.getElementById('HEAD label').innerHTML = head;
+}
+
+function fetchCompanion() {
+	gitsetup.emit('fetch');
+}
+
+function updateCompanion() {
+	if (!_choiceElement) {
+		console.log('no selection!');
+		return;
+	}
+	
+	// gitRef is formatted as:
+	// {
+	// 		'remote' : remoteName,
+	// 		'branch' : branchName || null,
+	// 		'tag'    : tagName    || null
+	// }
+	console.log('you want to update to', _choiceElement.gitRef);
+	
+	data = _choiceElement.gitRef;
+	data.copyOption = document.getElementById('copyOption').checked;
+	
+	gitsetup.emit('update with ref', data);
+}
+
+// checkout the currently selected reference
+function checkoutCompanion() {
+	if (!_choiceElement) {
+		console.log('no selection!');
+		return;
+	}
+	
+	// gitRef is formatted as:
+	// {
+	// 		'remote' : remoteName,
+	// 		'branch' : branchName || null,
+	// 		'tag'    : tagName    || null
+	// }
+	console.log('you want to checkout', _choiceElement.gitRef);
+	
+	gitsetup.emit('checkout with ref', _choiceElement.gitRef);
+}
+
+
+// We receive the most up-to-date list of all remote
+// references, then build a collapsible menu
+socket.on('refs', function(data) {
+	console.log('refs', data);
+	_refs = data;
+	buildRefOptions(data);
+});
+
+
+// Build a collapsable list of remote branch and tag refrences
+// An single reference may be selected as the candidate for a
+// checkout or software update
+//
+// Hierarchy is:
+//
+// remote1
+// |_branches
+// | |_branch1
+// | |_branch2
+// |_tags
+// | |_tag1
+// | |_tag2
+// remote2
+
+function buildRefOptions (refs) {
+	removeChildren("remoteList");
+	
+	Object.keys(refs.remotes).forEach(function(name) {
+		
+		// container for each new set of options
+		var remoteEntry = document.createElement('div');
+		
+		// collapsable remote name
+		var remoteLabel = document.createElement('h4');
+		remoteLabel.innerHTML = "\t" + name + " (" + refs.remotes[name].url + ")";
+		remoteLabel.style.display = "inline";
+		var authenticateButton = document.createElement("h4");
+		authenticateButton.style.display = "inline";
+		
+		if (!refs.remotes[name].authenticated) {
+			
+			authenticateButton.innerHTML = "\t\uD83D\uDD12";
+			
+			authenticateButton.onclick = (function() { 
+				// Thank you https://stackoverflow.com/questions/3495679/passing-parameters-in-javascript-onclick-event
+				return function() { 
+					authenticate(name);
+				}
+			})();
+			//remoteLabel.appendChild(authenticateButton);
+		}
+		
+		var removeButton = document.createElement('h4');
+		removeButton.style.display = "inline";
+		removeButton.innerHTML ='&nbsp;<i class="fa fa-trash" aria-hidden="true"></i>';
+		removeButton.onclick = (function() { 
+				// Thank you https://stackoverflow.com/questions/3495679/passing-parameters-in-javascript-onclick-event
+				return function() { 
+					removeRemote(name);
+				}
+			})();
+		
+		
+		var remoteDiv = document.createElement('div');
+
+		//remoteDiv.setAttribute=("class", "accordion-body collapse");
+		remoteDiv.className = "collapse";
+		
+		// Easy, but doesn't work...
+		//remoteLabel.onclick = remoteDiv.collapse('toggle');
+		
+		// Give it an ID and find it with jquery instead
+		remoteDiv.id = name + 'Div'; // 'originDiv'
+		remoteLabel.onclick = function() {
+			$('#' + name + 'Div').collapse('toggle');
+		};
+		
+		// collapsable branch list
+		var branchesLabel = document.createElement('h5');
+		branchesLabel.innerHTML = 'Branches';
+		var branchesDiv = document.createElement('div');
+		branchesDiv.className = "collapse";
+		branchesDiv.id = name + 'BranchesDiv'; // 'originBranchesDiv'
+		
+		// Bind label click to expand function
+		branchesLabel.onclick = function() {
+			$('#' + name + 'BranchesDiv').collapse('toggle');
+		};
+		
+		var branchesList = document.createElement('ul');
+		
+		branchesDiv.appendChild(branchesList);
+		
+		refs.remotes[name].branches.forEach(function(branchRef) {
+			var branchName = branchRef[0];
+			var oid = branchRef[1];
+			
+			el = document.createElement('li');
+			el.innerHTML = branchName + ' ' + oid;
+			el.onclick = function(event) {
+				console.log(event.target.gitName);
+				selectChoice(event.target);
+			}
+			el.gitName = name + '   ' + branchName;
+			el.gitRef = {
+				'remote' : name,
+				'branch' : branchName
+			}
+			//el.onclick = "selectChoice(this);";
+			// el.onclick = selectChoice(el); // easy, but doesn't work
+			branchesList.appendChild(el);
+		});
+		
+		
+		// collapsable tag list
+		var tagsLabel = document.createElement('h5');
+		tagsLabel.innerHTML = 'Tags';
+		var tagsDiv = document.createElement('div');
+		tagsDiv.className = "collapse";
+		tagsDiv.id = name + 'TagsDiv'; // 'originTagsDiv'
+		
+		// Bind label click to expand function
+		tagsLabel.onclick = function() {
+			$('#' + name + 'TagsDiv').collapse('toggle');
+		};
+		
+		var tagsList = document.createElement('ul');
+		
+		tagsDiv.appendChild(tagsList);
+		
+		refs.remotes[name].tags.forEach(function(tagRef) {
+			var tagName = tagRef[0];
+			var oid = tagRef[1];
+			
+			el = document.createElement('li');
+			el.innerHTML = tagName + '   ' + oid;
+			el.onclick = function(event) {
+				console.log(event.target.gitName);
+				selectChoice(event.target);
+			}
+			//el.gitName = name + ' ' + tagName;
+			
+			el.gitRef = {
+				'remote' : name,
+				'tag' : tagName
+			}
+			tagsList.appendChild(el);
+		});
+		
+		
+		remoteDiv.appendChild(branchesLabel);
+		remoteDiv.appendChild(branchesDiv);
+		
+		remoteDiv.appendChild(tagsLabel);
+		remoteDiv.appendChild(tagsDiv);
+		
+		remoteEntry.appendChild(removeButton);
+		remoteEntry.appendChild(remoteLabel);
+		remoteEntry.appendChild(authenticateButton);
+		remoteEntry.appendChild(remoteDiv);
+		
+		document.getElementById('remoteList').appendChild(remoteEntry);
+		
+		console.log('added', name);
+	});
+}
+
+
+function selectChoice(choiceElement) {
+	if (_choiceElement) {
+		_choiceElement.style = "";
+	}
+	_choiceElement = choiceElement;
+	choiceElement.style.backgroundColor = "yellow";
+	console.log(_choiceElement.style);
+}
+
+
+// Clear the list of remotes
+function removeChildren(id) {
+	console.log('removing refs');
+	var parent = document.getElementById(id);
+	while (parent.hasChildNodes()) {
+		parent.removeChild(parent.lastChild);
+	}
+}
+
+
+function addRemote() {
+	var name = document.getElementById('new remote name').value;
+	var url = document.getElementById('new remote url').value;
+	
+	gitsetup.emit('add remote', {
+		'name' : name,
+		'url'  : url
+	});
+}
+
+
+function removeRemote(remote) {
+	if (confirm("Are you sure you want to delete the remote " + remote + "?")) {
+		gitsetup.emit('remove remote', remote);
+	}
+}
+
+
+// Set width of all "dynamic-parent-width" elements to parent width
+function resizeDynamicWidthElement() {
+	var elements = document.getElementsByClassName("dynamic-parent-width");
+	for (i=0; i<elements.length; i++) {
+		elements[i].style.width = elements[i].parentElement.clientWidth + "px";
+	}
+}
+
+// Ask backend for a list of remotes so we can populate the list
+gitsetup.emit('get remotes');
+
+// Create event listener to dynamically resize elements when page is resized
+window.addEventListener('resize', resizeDynamicWidthElement);
+
+window.addEventListener("DOMContentLoaded", function() {
+	resizeDynamicWidthElement();
+});
+</script>
+
+<!-- Main Content -->
+<div id="content">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+						ArduSub Companion Ref Selection
+					</h3>
+				</div>
+				
+				<div class="panel-body">
+					<h1>Current HEAD:</h1>
+					<h3 id="HEAD label"><h3>
+					<h1>Add new remote</h1>
+					<form class="form-group" onsubmit="addRemote(); return false">
+						<input class="form-control" id="new remote name" style="width: 400px;" />
+						<input class="form-control" id="new remote url" style="width: 400px;" value="ssh://git@github.com/bluerobotics/repository.git" />
+						<input type="submit" class="btn btn-primary" value="Add New Remote" />
+					</form>
+					<h1>Remotes:</h1>
+					<input type="submit" class="btn btn-primary" value="Checkout" onClick="checkoutCompanion()"/>
+					<input type="submit" class="btn btn-primary" value="Fetch" onClick="fetchCompanion()"/>
+					<input type="submit" class="btn btn-primary" value="Update" onClick="updateCompanion()"/>
+					<input type="checkbox" id="copyOption">Copy Repo</input>
+					
+					<div class="col-md-12" id="remoteList">
+						<!-- populated by javascript -->
+					</div>
+					
+					<div>
+						<textarea rows="20" cols="120" id="terminal-output"
+							style="font-family:monospace; resize: vertical"
+							class="dynamic-parent-width" readonly></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% include ../_includes/footer.liquid %}

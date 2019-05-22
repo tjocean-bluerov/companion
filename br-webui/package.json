@@ -1,0 +1,32 @@
+{
+  "name": "webui",
+  "version": "0.0.1",
+  "private": "true,",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "bootstrap": "3.3.7",
+    "bootstrap-select": "1.12.4",
+    "bootstrap-slider": "10.0.0",
+    "bootstrap-switch": "3.3.4",
+    "express": "4.15.2",
+    "express-liquid": "0.2.6",
+    "font-awesome": "4.7.0",
+    "fs": "0.0.1-security",
+    "jquery": "3.2.1",
+    "network-js": "2.1.0",
+    "node-file-manager": "0.4.6",
+    "nodegit": "0.18.3",
+    "socket.io": "1.7.3",
+    "socket.io-file": "2.0.14",
+    "socket.io-file-client": "2.0.121",
+    "tracer": "0.8.9",
+    "v4l2camera": "git://github.com/jaxxzer/node-v4l2camera.git#799f6eda"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}

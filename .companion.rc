@@ -1,0 +1,34 @@
+export COMPANION_DIR=/home/pi/companion
+
+# copy default parameters if neccessary
+cd $COMPANION_DIR/params
+
+for default_param_file in *; do
+    if [[ $default_param_file == *".param.default" ]]; then
+        param_file="/home/pi/"$(echo $default_param_file | sed "s/.default//")
+        if [ ! -e "$param_file" ]; then
+            cp $default_param_file $param_file
+        fi
+    fi
+done
+
+if [ ! -f /home/pi/.updating ]; then
+	sudo -H -u pi screen -dm -S mavproxy $COMPANION_DIR/scripts/start_mavproxy_telem_splitter.sh
+	sudo -H -u pi $COMPANION_DIR/scripts/start_video.sh $(cat /home/pi/vidformat.param)
+	sudo -H -u pi screen -dm -S webui $COMPANION_DIR/scripts/start_webui.sh
+	sudo -H -u pi screen -dm -S webterminal $COMPANION_DIR/scripts/start_webterminal.sh
+	sudo -H -u pi screen -dm -S commrouter $COMPANION_DIR/tools/comm_router.py
+	sudo -H -u pi screen -dm -S audio $COMPANION_DIR/scripts/start_audio.sh
+	sudo -H -u pi screen -dm -S file-manager node --harmony $COMPANION_DIR/br-webui/node_modules/node-file-manager/lib/index.js -p 7777 -d /
+	sudo -H -u pi screen -dm -S nmearx $COMPANION_DIR/tools/nmea-receiver.py
+	sudo -H -u pi screen -dm -S wldriver $COMPANION_DIR/tools/underwater-gps.py --ip=192.168.2.94 --port=80
+else
+	sudo -H -u pi echo 'UPDATE FAILED!' >> /home/pi/.update_log
+	rm -f /home/pi/.updating
+	if [ -d /home/pi/.companion ]; then
+		rm -rf $COMPANION_DIR
+		sudo -H -u pi cp -r /home/pi/.companion $COMPANION_DIR
+	fi
+	sudo -H -u pi echo 'Trying to run again...' >> /home/pi/.update_log
+	$COMPANION_DIR/.companion.rc
+fi
