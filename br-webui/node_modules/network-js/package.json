@@ -1,0 +1,101 @@
+{
+  "_args": [
+    [
+      "network-js@2.1.0",
+      "/home/pi/companion/br-webui"
+    ]
+  ],
+  "_from": "network-js@2.1.0",
+  "_id": "network-js@2.1.0",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/network-js",
+  "_nodeVersion": "0.12.2",
+  "_npmUser": {
+    "email": "pardanaud.j@gmail.com",
+    "name": "nesk"
+  },
+  "_npmVersion": "2.13.2",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "network-js",
+    "raw": "network-js@2.1.0",
+    "rawSpec": "2.1.0",
+    "scope": null,
+    "spec": "2.1.0",
+    "type": "version"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/network-js/-/network-js-2.1.0.tgz",
+  "_shasum": "df063ba179b5ce15fd301b458767520a767a1674",
+  "_shrinkwrap": null,
+  "_spec": "network-js@2.1.0",
+  "_where": "/home/pi/companion/br-webui",
+  "author": {
+    "name": "Johann Pardanaud"
+  },
+  "bugs": {
+    "url": "https://github.com/nesk/network.js/issues"
+  },
+  "dependencies": {},
+  "description": "Make accurate network measures in JavaScript",
+  "devDependencies": {
+    "babelify": "~6.1.2",
+    "browserify": "^10.2.4",
+    "chai": "^3.0.0",
+    "chai-spies": "^0.6.0",
+    "chalk": "^1.1.0",
+    "exorcist": "^0.4.0",
+    "gulp": "^3.9.0",
+    "gulp-bump": "^0.3.1",
+    "gulp-git": "^1.2.4",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "mocha": "^2.2.5",
+    "mocha-phantomjs": "^3.5.3",
+    "npm": "^2.12.1",
+    "phantomjs": "1.9.1 - 1.9.7-15",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "yargs": "^3.15.0"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "df063ba179b5ce15fd301b458767520a767a1674",
+    "tarball": "https://registry.npmjs.org/network-js/-/network-js-2.1.0.tgz"
+  },
+  "gitHead": "d01c3b8ddbb80ab590cd2327e5f61d3eb09684b3",
+  "homepage": "https://github.com/nesk/network.js",
+  "keywords": [
+    "bandwidth",
+    "connection",
+    "latency",
+    "network",
+    "speed",
+    "speedtest",
+    "test"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "nesk",
+      "email": "pardanaud.j@gmail.com"
+    }
+  ],
+  "name": "network-js",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nesk/network.js.git"
+  },
+  "scripts": {
+    "build": "gulp",
+    "test": "gulp; echo '\\n'; mocha-phantomjs test/test.html",
+    "watch": "gulp && echo '\\n' && gulp watch"
+  },
+  "version": "2.1.0"
+}

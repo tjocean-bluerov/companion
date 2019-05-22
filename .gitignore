@@ -1,5 +1,0 @@
-*~
-*.project
-br-webui/node_modules/*
-config/*
-*.pyc
